@@ -26,9 +26,12 @@ void Parser::parse()
 	}
 	catch (ParserException parserException)
 	{
-		cout << "Error at line: " << current_line << ". Parser failed";
+		cout << "Error at line: " << current_line << ". Parser failed"<<endl;
 	}
-		
+	
+
+	assembler.printSectionList();
+	//assembler.printSymbolTable();
 	
 }
 
@@ -49,6 +52,7 @@ void Parser::parseLine()
 		if (nextToken.getTokenType() == TokenType::COLON)
 		{
 			//dodaj u asm LABELU
+			assembler.addLabel(currToken.text());
 		}
 		//INSTRUKCIJA ADD
 		else instructionAdd();
@@ -79,6 +83,7 @@ void Parser::directiveAdd()
 		debug(TokenType::SYMBOL);
 
 		//dodaj sekciju
+		assembler.addSection(currToken.text());
 
 		currToken = tokens[currTokenID++];
 		nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
@@ -88,14 +93,15 @@ void Parser::directiveAdd()
 
 		debug(TokenType::SYMBOL);
 		//dodaj global
-
+		assembler.addGlobal(currToken.text());//mozda moze da se odmah zna sekcija tako sto ce asm da pamti u kojoj je sekciji
 		currToken = tokens[currTokenID++];
 		nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
 		//vidi sta ces sa eksternom
 		while (checkNext(TokenType::COMMA))
 		{
 			debug(TokenType::SYMBOL);
-			//_assembler.globalDef(_curr_token.text());
+			assembler.addGlobal(currToken.text());
+
 			currToken = tokens[currTokenID++];
 			nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
 
@@ -107,6 +113,7 @@ void Parser::directiveAdd()
 
 		debug(TokenType::SYMBOL);
 		//dodaj global
+		assembler.addExtern(currToken.text());
 
 		currToken = tokens[currTokenID++];
 		nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
@@ -114,7 +121,7 @@ void Parser::directiveAdd()
 		while (checkNext(TokenType::COMMA))
 		{
 			debug(TokenType::SYMBOL);
-			//_assembler.globalDef(_curr_token.text());
+			assembler.addExtern(currToken.text());
 			currToken = tokens[currTokenID++];
 			nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
 
@@ -124,22 +131,22 @@ void Parser::directiveAdd()
 	else if (token.getTokenType() == TokenType::WORD) {
 
 		debug({ TokenType::LITERAL, TokenType::SYMBOL });
-		
+		//ubaci token
 		defineWord();
 		currToken = tokens[currTokenID++];
 		nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
-
+		
 		while (checkNext(TokenType::COMMA))
 		{
 			debug({ TokenType::LITERAL, TokenType::SYMBOL });
-
+			//ubaci currtoken
 			defineWord();
 			currToken = tokens[currTokenID++];
 			nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
 
 		}
 
-
+		
 	}
 	else if (token.getTokenType() == TokenType::EQU) {
 
@@ -149,12 +156,17 @@ void Parser::directiveAdd()
 		debug(TokenType::SYMBOL);
 
 		//sacuvaj simbol
+		
+		string symbolNameTemp = currToken.text();
+
+		//nova fja koja odmah ubacuje value uvek je value, Local, absolute, ime, id dodat.
 
 		currToken = tokens[currTokenID++];
 		nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
 
 		debug(TokenType::LITERAL);
-	
+		
+		assembler.addEqu(symbolNameTemp, currToken.text());//nekako da zna absolute sekciju
 		//dodaj vrednost simbolu
 
 		currToken = tokens[currTokenID++];
@@ -163,7 +175,7 @@ void Parser::directiveAdd()
 
 	}
 	else if (token.getTokenType() == TokenType::SKIP) {
-		checkNext(TokenType::LITERAL);
+		debug(TokenType::LITERAL);
 		//_assembler.skipDef(std::stoi(_curr_token.text()));
 		currToken = tokens[currTokenID++];
 		nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
@@ -211,4 +223,11 @@ bool Parser::checkNext(TokenType tokenType)
 
 void Parser::defineWord()
 {
+	//ovde si stao treba da se upise wrod
+	/*if (currToken.getTokenType() == TokenType::SYMBOL)
+		assembler.addWord(currToken.text());
+	else
+		assembler.addWord(std::stoi(currToken.text());*/
+
+	assembler.addWord(currToken.text());
 }

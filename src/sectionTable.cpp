@@ -1,31 +1,31 @@
 #include "sectionTable.h"
 
-int Sections::getID()
+int Section::getID()
 {
 	return id;
 }
 
-std::string Sections::getSectionName()
+std::string Section::getSectionName()
 {
 	return sectionName;
 }
 
-int Sections::getSectionSize()
+int Section::getSectionSize()
 {
 	return sectionSize;
 }
 
-void Sections::setId(int _id)
+void Section::setId(int _id)
 {
 	id = _id;
 }
 
-void Sections::setSectionName(std::string _sectionName)
+void Section::setSectionName(std::string _sectionName)
 {
 	sectionName = _sectionName;
 }
 
-void Sections::setSectionSize(int _sectionSize)
+void Section::setSectionSize(int _sectionSize)
 {
 	sectionSize = _sectionSize;
 }

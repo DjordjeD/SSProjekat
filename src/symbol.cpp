@@ -30,6 +30,11 @@ bool Symbol::isDefined()
 	return isDefinedAlready;
 }
 
+string Symbol::getSection()
+{
+	return symbolSection->getSectionName();
+}
+
 void Symbol::setSymbolName(string name)
 {
 	symbolName = name;

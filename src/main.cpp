@@ -4,6 +4,7 @@
 
 #include "lex.yy.h"
 #include "tokens.h"
+#include "parseric.h"
 
 /*
 * Start ::= [[LabelaDef] DirectiveDef|InstructionDef] (LINE_END|FILE_END)
@@ -51,18 +52,20 @@ int main(int argc, char** argv)
 
 	}
 	//int i = 0;
-	for (auto const& value : tokens)
-	{
-		cout << value.getTokenType() << " " << value.text() << endl;
-	}
 
 
 
 	//potencijalan problem sa komentarima
 
-	//Parser parser(tokens);
+	Parser parser(tokens);
 
-	//parser.parse();
+	parser.parse();
+
+	for (auto const& value : tokens)
+{
+	cout << value.getTokenType() << " " << value.text() << endl;
+}
+
 
 	return 0;
 

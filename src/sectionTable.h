@@ -3,8 +3,9 @@
 #include <iostream>
 
 
-class Sections {
+class Section {
 
+	public:
 	int getID();
 	std::string getSectionName();
 	int getSectionSize();
@@ -13,9 +14,9 @@ class Sections {
 	void setSectionName(std::string _sectionName);
 	void setSectionSize(int _sectionSize);
 
-	
+	Section(int _id, std::string _sectionName) : id(_id), sectionName(_sectionName) { sectionSize = 0; }
 
-private :
+	private :
 
 	int id;
 	std::string sectionName;

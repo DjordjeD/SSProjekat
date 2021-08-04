@@ -1,13 +1,14 @@
 #pragma once
 
 #include "tokens.h"
+#include "assembler.h"
 #include <iostream>
 #include <vector>
 using namespace std;
 
 
 class Parser {
-
+public:
 	void parse();
 	Parser(vector<Token>& _tokens)
 	{
@@ -21,7 +22,7 @@ class Parser {
 
 private:
 
-	//Assembler assembler
+	Assembler assembler;
 	void parseLine();
 	void directiveAdd();
 	void instructionAdd();

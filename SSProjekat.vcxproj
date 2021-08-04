@@ -140,6 +140,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\assembler.h" />
     <ClInclude Include="src\lex.yy.h" />
     <ClInclude Include="src\parseric.h" />
     <ClInclude Include="src\sectionTable.h" />
@@ -147,6 +148,7 @@
     <ClInclude Include="src\tokens.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\assembler.cpp" />
     <ClCompile Include="src\lexeric.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="reflex\lib\convert.cpp" />
