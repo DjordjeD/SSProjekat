@@ -10,10 +10,10 @@ void Assembler::addSection(string SectionName)
 	Section temp(sidSection, SectionName); sidSection++;
 	sectionList.push_back(temp);
 
-	//Symbol* symbol = getSymbol(text);
 
+	Symbol* symbol = getSymbol(SectionName);
 	//pazi na ubacivanje sekcija 
-	
+	//tek u drugom prolazu on zna koja je sekcija	
 
 }
 
@@ -35,13 +35,17 @@ void Assembler::printSectionList()
 }
 
 
+
 void Assembler::printSymbolTable()
 {
+	cout<< "Symbol table:" << endl;
+	cout << "Value\tType\tSection\t\tName\t\tId" << endl;
 
 	for (auto& i : symbolTable)
 	{
-		cout << i.getValue() << " " << " " << i.getSection()<<" "<<i.getSymbolName()<<" "<<i.getNumberID() << endl;
+		cout << i.getValue() << " "<<scopePrint(i) << " " << i.getSection()<<" "<<i.getSymbolName()<<" "<<i.getNumberID() << endl;
 	}
+	cout << endl<<" END OF SYMBOL TABLE"<<endl<<endl;
 }
 
 void Assembler::addSymbol(string symbolName)
@@ -72,6 +76,12 @@ Symbol* Assembler::getSymbol(string symbolName)
 		if (i.getSymbolName() == symbolName) return &i;
 	}
 
+}
+
+Symbol* Assembler::getSymbol(string symbolName, string sectionName)
+{
+	// zasad visak
+	return nullptr;
 }
 
 Symbol* Assembler::getSymbolCheck(string symbolName)
@@ -112,13 +122,13 @@ void Assembler::addExtern(string text)
 {
 	Symbol* symbol = getSymbol(text);
 
-	symbol->setSymbolScope(SymbolScope::GLOBAL);
+	symbol->setSymbolScope(SymbolScope::EXTERN);
 }
 
 void Assembler::addEqu(string name, string tokenText)
 {
 	Symbol* symbol = getSymbolCheck(name);
-	Symbol s1(name, std::stoi(tokenText));
+	Symbol s1(name, std::stoi(tokenText,0,16));
 	/*
 	symbolType = SymbolType::EQU;
 		value = _value;
@@ -137,4 +147,17 @@ void Assembler::addWord(string text)
 	Symbol* symbol = getSymbol(text);
 
 	// u drugom prolazu mozda i relokacija i vrednost u memoriju
+}
+
+string Assembler::scopePrint(Symbol s)
+{
+	if (s.getSymbolScope() == SymbolScope::GLOBAL)
+	{
+		return "g";
+	}
+	else if (s.getSymbolScope() == SymbolScope::EXTERN)
+	{
+		return "e";
+	}
+	else 	if (s.getSymbolScope() == SymbolScope::LOCAL) return "l";
 }

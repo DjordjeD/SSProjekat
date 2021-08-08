@@ -16,22 +16,24 @@ void Parser::parse()
 	nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
 	int current_line = 0;
 
-	try
+	while (currToken.getTokenType() != TokenType::FILE_END && currToken.getTokenType() != TokenType::END)
 	{
-		while (currToken.getTokenType() != TokenType::FILE_END && currToken.getTokenType() != TokenType::END)
+		try
 		{
 			current_line++;
 			parseLine();
 		}
+		catch (ParserException parserException)
+		{
+			cout << "Error at line: " << current_line << ". Parser failed" << endl;
+		}
+		
 	}
-	catch (ParserException parserException)
-	{
-		cout << "Error at line: " << current_line << ". Parser failed"<<endl;
-	}
-	
 
+	
+	assembler.printSymbolTable();
 	assembler.printSectionList();
-	//assembler.printSymbolTable();
+	// 
 	
 }
 
@@ -53,6 +55,10 @@ void Parser::parseLine()
 		{
 			//dodaj u asm LABELU
 			assembler.addLabel(currToken.text());
+			currToken = tokens[currTokenID++];
+			nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+			currToken = tokens[currTokenID++];
+			nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
 		}
 		//INSTRUKCIJA ADD
 		else instructionAdd();
@@ -93,14 +99,14 @@ void Parser::directiveAdd()
 
 		debug(TokenType::SYMBOL);
 		//dodaj global
-		assembler.addGlobal(currToken.text());//mozda moze da se odmah zna sekcija tako sto ce asm da pamti u kojoj je sekciji
+		assembler.addExtern(currToken.text());//mozda moze da se odmah zna sekcija tako sto ce asm da pamti u kojoj je sekciji
 		currToken = tokens[currTokenID++];
 		nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
 		//vidi sta ces sa eksternom
 		while (checkNext(TokenType::COMMA))
 		{
 			debug(TokenType::SYMBOL);
-			assembler.addGlobal(currToken.text());
+			assembler.addExtern(currToken.text());
 
 			currToken = tokens[currTokenID++];
 			nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
@@ -149,9 +155,11 @@ void Parser::directiveAdd()
 		
 	}
 	else if (token.getTokenType() == TokenType::EQU) {
-
+		/*
 		currToken = tokens[currTokenID++];
 		nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+		*/
+		
 
 		debug(TokenType::SYMBOL);
 
@@ -164,14 +172,16 @@ void Parser::directiveAdd()
 		currToken = tokens[currTokenID++];
 		nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
 
+		currToken = tokens[currTokenID++];
+		nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+
 		debug(TokenType::LITERAL);
 		
 		assembler.addEqu(symbolNameTemp, currToken.text());//nekako da zna absolute sekciju
 		//dodaj vrednost simbolu
-
 		currToken = tokens[currTokenID++];
 		nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
-		
+
 
 	}
 	else if (token.getTokenType() == TokenType::SKIP) {
@@ -187,8 +197,16 @@ void Parser::directiveAdd()
 
 void Parser::instructionAdd()
 {
-	cout << "usao u instruction ADD !" << endl;
+	//cout << "usao u instruction ADD !" << endl;
 
+	while (currToken.getTokenType() != TokenType::LINE_END)
+	{
+		cout << currToken.text()<<" ";
+		currToken = tokens[currTokenID++];
+		nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+	
+	}
+	cout << endl;
 }
 
 void Parser::debug(TokenType tokenType)

@@ -22,6 +22,12 @@ class Assembler {
 		sectionList.push_back(sec);
 		Section sec2(0, "UNDEFINED");
 		sectionList.push_back(sec2);
+
+		Symbol section1("ABSOLUTE", "ABSOLUTE");
+		Symbol section2("UNDEFINED", "UNDEFINED");
+
+		symbolTable.push_back(section1);
+		symbolTable.push_back(section2);
 		
 	}
 
@@ -33,6 +39,7 @@ class Assembler {
 
 	void addSymbol(string symbolName);
 	Symbol* getSymbol(string symbolName);
+	Symbol* getSymbol(string symbolName,string sectionName);
     Symbol* getSymbolCheck(string symbolName);	
 
 		void addLabel(string text);
@@ -41,6 +48,6 @@ class Assembler {
 		void addEqu(string name,string tokenText);
 		void addWord(string text);	
 	
-	
+		string scopePrint(Symbol s);
 
 };

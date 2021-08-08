@@ -32,7 +32,7 @@ bool Symbol::isDefined()
 
 string Symbol::getSection()
 {
-	return symbolSection->getSectionName();
+	return symbolSection;
 }
 
 void Symbol::setSymbolName(string name)

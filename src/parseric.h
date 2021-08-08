@@ -32,6 +32,8 @@ private:
 	bool checkNext(TokenType tokenType);
 	void defineWord();
 
+
+
 	//proveri kad se pomeraju tokeni da li odmah ili pre
 
 

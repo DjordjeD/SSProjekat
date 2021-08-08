@@ -60,12 +60,12 @@ int main(int argc, char** argv)
 	Parser parser(tokens);
 
 	parser.parse();
-
+/*
 	for (auto const& value : tokens)
 {
 	cout << value.getTokenType() << " " << value.text() << endl;
 }
-
+*/
 
 	return 0;
 

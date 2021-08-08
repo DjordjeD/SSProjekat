@@ -5,7 +5,7 @@ using namespace std;
 
 
 enum class SymbolType { EQU, LABEL, SECTION };
-enum class SymbolScope { GLOBAL, LOCAL };
+enum class SymbolScope { GLOBAL, LOCAL,EXTERN };
 
 static int sid = 0;
 
@@ -33,6 +33,7 @@ public:
 		symbolScope = SymbolScope::LOCAL;
 		numberID = sid++;
 		isDefinedAlready = false;
+		symbolSection = "UNDEFINED";
 		//default section undefined
 	}
 
@@ -43,6 +44,17 @@ public:
 		numberID = sid++;
 		isDefinedAlready = false;
 		//sekcija absolute
+		symbolSection = "ABSOLUTE";
+	}
+
+	Symbol(string _symbolName, string _section) :symbolName(_symbolName) {//pazi na ovo moguce greske zbog defaulta
+		symbolType = SymbolType::LABEL;
+		value = 0;
+		symbolScope = SymbolScope::LOCAL;
+		numberID = sid++;
+		isDefinedAlready = false;
+		//sekcija zadata
+		symbolSection = _section;
 	}
 
 
@@ -54,6 +66,6 @@ public:
 	SymbolScope symbolScope;
 	int numberID;
 	bool isDefinedAlready;
-	Section* symbolSection;
+	string symbolSection;
 
 };
