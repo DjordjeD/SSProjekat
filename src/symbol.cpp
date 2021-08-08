@@ -35,6 +35,11 @@ string Symbol::getSection()
 	return symbolSection;
 }
 
+void Symbol::setSection(string section)
+{
+	symbolSection = section;
+}
+
 void Symbol::setSymbolName(string name)
 {
 	symbolName = name;

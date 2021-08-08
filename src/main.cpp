@@ -61,10 +61,10 @@ int main(int argc, char** argv)
 
 	parser.parse();
 
-	for (auto const& value : tokens)
-{
-	cout << value.getTokenType() << " " << value.text() << endl;
-}
+//	for (auto const& value : tokens)
+//{
+//	cout << value.getTokenType() << " " << value.text() << endl;
+//}
 
 
 	return 0;

@@ -18,17 +18,21 @@ class Assembler {
 	
 	Assembler()
 	{
-		Section sec(-1, "ABSOLUTE");
-		sectionList.push_back(sec);
+		Section sec1(-1, "ABSOLUTE");
+		sectionList.push_back(sec1);
 		Section sec2(0, "UNDEFINED");
 		sectionList.push_back(sec2);
 
-		Symbol section1("ABSOLUTE", "ABSOLUTE");
-		Symbol section2("UNDEFINED", "UNDEFINED");
+		Symbol section1("ABSOLUTE", "ABSOLUTE",-1);
+		Symbol section2("UNDEFINED", "UNDEFINED",0);
 
 		symbolTable.push_back(section1);
 		symbolTable.push_back(section2);
 		
+		absoluteSection = &sectionList[0];
+		undefinedSection = &sectionList[1];
+		currentSection = &sectionList[1];
+		locationCounter = 0;
 	}
 
 	void addSection(string SectionName);
@@ -47,7 +51,17 @@ class Assembler {
 		void addExtern(string text);
 		void addEqu(string name,string tokenText);
 		void addWord(string text);	
+		void skipDef(int size);
 	
 		string scopePrint(Symbol s);
 
+		void updateLocationCounter(int size);
+
+private :
+	
+	int locationCounter;
+
+	Section* currentSection;
+	Section* undefinedSection;
+	Section* absoluteSection;
 };

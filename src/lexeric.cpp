@@ -95,7 +95,7 @@ class Lexer : public reflex::AbstractLexer<reflex::Matcher> {
 
 Token Lexer::lex(void)
 {
-  static const char *REGEX_INITIAL = "(?m)((?:\\r?\\n))|((?:(?:\\Q.global\\E)))|((?:(?:\\Q.extern\\E)))|((?:(?:\\Q.section\\E)))|((?:(?:\\Q.end\\E)))|((?:(?:\\Q.word\\E)))|((?:(?:\\Q.equ\\E)))|((?:(?:\\Q:\\E)))|((?:(?:\\Q.skip\\E)))|((?:(?:\\Q,\\E)))|((?:(?:\\Q+\\E)))|((?:(?:\\Q-\\E)))|((?:(?:\\Q*\\E)))|((?:(?:\\Q$\\E)))|((?:(?:\\Q%\\E)))|((?:(?:\\Q(\\E)))|((?:(?:\\Q)\\E)))|((?:(?:r[0-7]?)))|((?:(?:[1-9][0-9]*)|(?:0[0-7]*)|(?:0x[0-9A-Fa-f]+)))|((?:[A-Za-z][0-9A-Z_a-z]*))|((?:(?:\\Q#\\E)))|((?:[\\x09\\x20]))|((?:.))";
+  static const char *REGEX_INITIAL = "(?m)((?:\\r?\\n))|((?:(?:\\Q.global\\E)))|((?:(?:\\Q.extern\\E)))|((?:(?:\\Q.section\\E)))|((?:(?:\\Q.end\\E)))|((?:(?:\\Q.word\\E)))|((?:(?:\\Q.equ\\E)))|((?:(?:\\Q:\\E)))|((?:(?:\\Q.skip\\E)))|((?:(?:\\Q,\\E)))|((?:(?:\\Q+\\E)))|((?:(?:\\Q-\\E)))|((?:(?:\\Q*\\E)))|((?:(?:\\Q$\\E)))|((?:(?:\\Q%\\E)))|((?:(?:\\Q[\\E)))|((?:(?:\\Q]\\E)))|((?:(?:r[0-7]?)))|((?:(?:[1-9][0-9]*)|(?:0[0-7]*)|(?:0x[0-9A-Fa-f]+)))|((?:[A-Za-z][0-9A-Z_a-z]*))|((?:(?:\\Q#\\E)))|((?:[\\x09\\x20]))|((?:.))";
   static const reflex::Pattern PATTERN_INITIAL(REGEX_INITIAL);
   static const char *REGEX_COMMENT = "(?m)((?:\\r?\\n))|((?:.))";
   static const reflex::Pattern PATTERN_COMMENT(REGEX_COMMENT);

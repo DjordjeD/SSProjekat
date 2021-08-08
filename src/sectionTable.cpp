@@ -29,3 +29,13 @@ void Section::setSectionSize(int _sectionSize)
 {
 	sectionSize = _sectionSize;
 }
+
+void Section::increaseSize(int size)
+{
+	sectionSize += size;
+}
+
+void Section::increaseSize()
+{
+	sectionSize++;
+}

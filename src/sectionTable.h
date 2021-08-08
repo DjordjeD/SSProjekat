@@ -13,6 +13,8 @@ class Section {
 	void setId(int _id);
 	void setSectionName(std::string _sectionName);
 	void setSectionSize(int _sectionSize);
+	void increaseSize(int size);
+	void increaseSize();
 
 	Section(int _id, std::string _sectionName) : id(_id), sectionName(_sectionName) { sectionSize = 0; }
 

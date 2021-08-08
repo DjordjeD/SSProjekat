@@ -13,7 +13,19 @@ void Assembler::addSection(string SectionName)
 
 	Symbol* symbol = getSymbol(SectionName);
 	//pazi na ubacivanje sekcija 
-	//tek u drugom prolazu on zna koja je sekcija	
+	//tek u drugom prolazu on zna koja je sekcija
+	if (symbol->isDefined() == false)
+	{
+		currentSection->increaseSize(locationCounter);
+
+		currentSection = getSection(SectionName);// sta ako ne postoji
+		
+		symbol->setSection(currentSection->getSectionName());
+		//symbol->setValue(0);
+		symbol->setIsDefined(true);
+		locationCounter = 0;
+
+	}
 
 }
 
@@ -43,7 +55,7 @@ void Assembler::printSymbolTable()
 
 	for (auto& i : symbolTable)
 	{
-		cout << i.getValue() << " "<<scopePrint(i) << " " << i.getSection()<<" "<<i.getSymbolName()<<" "<<i.getNumberID() << endl;
+		cout << hex <<i.getValue() << " "<<scopePrint(i) << " " << i.getSection()<<" "<<i.getSymbolName()<<" "<<i.getNumberID() << endl;
 	}
 	cout << endl<<" END OF SYMBOL TABLE"<<endl<<endl;
 }
@@ -104,11 +116,13 @@ void Assembler::addLabel(string text)
 	Symbol* symbol = getSymbol(text);
 	//ako nije definisan definisi ga
 
-	//if (!symbol->isDefined())
-	//{
-	//	symbol->setIsDefined(true);
-	//	symbol.
-	//}
+	if (symbol->isDefined()==false)
+	{
+		symbol->setIsDefined(true);
+		symbol->setValue(locationCounter);
+		symbol->setSection(currentSection->getSectionName());
+		//symbol->setSymbolType(SymbolType::LABEL);
+	}
 }
 
 void Assembler::addGlobal(string text)
@@ -147,6 +161,12 @@ void Assembler::addWord(string text)
 	Symbol* symbol = getSymbol(text);
 
 	// u drugom prolazu mozda i relokacija i vrednost u memoriju
+	locationCounter += 2;
+}
+
+void Assembler::skipDef(int size)
+{
+	locationCounter += size;
 }
 
 string Assembler::scopePrint(Symbol s)
@@ -160,4 +180,10 @@ string Assembler::scopePrint(Symbol s)
 		return "e";
 	}
 	else 	if (s.getSymbolScope() == SymbolScope::LOCAL) return "l";
+}
+
+void Assembler::updateLocationCounter(int size)
+{
+	locationCounter += size;
+	currentSection->increaseSize(size);
 }

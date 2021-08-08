@@ -7,7 +7,7 @@ using namespace std;
 enum class SymbolType { EQU, LABEL, SECTION };
 enum class SymbolScope { GLOBAL, LOCAL,EXTERN };
 
-static int sid = 0;
+static int sid = 1;
 
 class Symbol {
 public:
@@ -19,6 +19,7 @@ public:
 	bool isDefined();
 	//get i set section;
 	string getSection();
+	void setSection(string section);
 
 	void setSymbolName(string name);
 	void setSymbolType(SymbolType type);
@@ -47,11 +48,11 @@ public:
 		symbolSection = "ABSOLUTE";
 	}
 
-	Symbol(string _symbolName, string _section) :symbolName(_symbolName) {//pazi na ovo moguce greske zbog defaulta
+	Symbol(string _symbolName, string _section, int id) :symbolName(_symbolName) {//pazi na ovo moguce greske zbog defaulta
 		symbolType = SymbolType::LABEL;
 		value = 0;
 		symbolScope = SymbolScope::LOCAL;
-		numberID = sid++;
+		numberID = id;
 		isDefinedAlready = false;
 		//sekcija zadata
 		symbolSection = _section;

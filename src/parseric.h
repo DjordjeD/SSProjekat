@@ -26,7 +26,7 @@ private:
 	void parseLine();
 	void directiveAdd();
 	void instructionAdd();
-
+	
 	void debug(TokenType tokenType);
 	void debug(vector<TokenType> list);
 	bool checkNext(TokenType tokenType);
