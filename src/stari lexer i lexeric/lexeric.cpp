@@ -95,7 +95,7 @@ class Lexer : public reflex::AbstractLexer<reflex::Matcher> {
 
 Token Lexer::lex(void)
 {
-  static const char *REGEX_INITIAL = "(?m)((?:\\r?\\n))|((?:(?:\\Q.global\\E)))|((?:(?:\\Q.extern\\E)))|((?:(?:\\Q.section\\E)))|((?:(?:\\Q.end\\E)))|((?:(?:\\Q.word\\E)))|((?:(?:\\Q.equ\\E)))|((?:(?:\\Q:\\E)))|((?:(?:\\Q.skip\\E)))|((?:(?:\\Q,\\E)))|((?:(?:\\Q+\\E)))|((?:(?:\\Q-\\E)))|((?:(?:\\Q*\\E)))|((?:(?:\\Q$\\E)))|((?:(?:\\Q%\\E)))|((?:(?:\\Q(\\E)))|((?:(?:\\Q)\\E)))|((?:(?:r[0-7]?)))|((?:(?:[1-9][0-9]*)|(?:0[0-7]*)|(?:0x[0-9A-Fa-f]+)))|((?:[A-Za-z][0-9A-Z_a-z]*))|((?:(?:\\Q#\\E)))|((?:[\\x09\\x20]))|((?:.))";
+  static const char *REGEX_INITIAL = "(?m)((?:\\r?\\n))|((?:(?:\\Q.global\\E)))|((?:(?:\\Q.extern\\E)))|((?:(?:\\Q.section\\E)))|((?:(?:\\Q.end\\E)))|((?:(?:\\Q.word\\E)))|((?:(?:\\Q.equ\\E)))|((?:(?:\\Q:\\E)))|((?:(?:\\Q.skip\\E)))|((?:(?:\\Q,\\E)))|((?:(?:\\Q+\\E)))|((?:(?:\\Q-\\E)))|((?:(?:\\Q*\\E)))|((?:(?:\\Q$\\E)))|((?:(?:\\Q(\\E)))|((?:(?:\\Q)\\E)))|((?:(?:r[0-7]?)))|((?:(?:[1-9][0-9]*)|(?:0[0-7]*)|(?:0x[0-9A-Fa-f]+)))|((?:[A-Za-z][0-9A-Z_a-z]*))|((?:(?:\\Q#\\E)))|((?:[\\x09\\x20]))|((?:.))";
   static const reflex::Pattern PATTERN_INITIAL(REGEX_INITIAL);
   static const char *REGEX_COMMENT = "(?m)((?:\\r?\\n))|((?:.))";
   static const reflex::Pattern PATTERN_COMMENT(REGEX_COMMENT);
@@ -114,7 +114,7 @@ Token Lexer::lex(void)
           case 0:
             if (matcher().at_end())
             {
-#line 61 "generator.l"
+#line 59 "generator.l"
 { return Token(TokenType::FILE_END, str());    }
             }
             else
@@ -122,96 +122,92 @@ Token Lexer::lex(void)
               out().put(matcher().input());
             }
             break;
-          case 1: // rule generator.l:41: {line_end} :
-#line 41 "generator.l"
+          case 1: // rule generator.l:40: {line_end} :
+#line 40 "generator.l"
 { return Token(TokenType::LINE_END, str()); }
             break;
-          case 2: // rule generator.l:42: {global} :
-#line 42 "generator.l"
+          case 2: // rule generator.l:41: {global} :
+#line 41 "generator.l"
 { return Token(TokenType::GLOBAL, str());      }
             break;
-          case 3: // rule generator.l:43: {extern} :
-#line 43 "generator.l"
+          case 3: // rule generator.l:42: {extern} :
+#line 42 "generator.l"
 { return Token(TokenType::EXTERN, str());      }
             break;
-          case 4: // rule generator.l:44: {section} :
-#line 44 "generator.l"
+          case 4: // rule generator.l:43: {section} :
+#line 43 "generator.l"
 { return Token(TokenType::SECTION, str());     }
             break;
-          case 5: // rule generator.l:45: {end} :
-#line 45 "generator.l"
+          case 5: // rule generator.l:44: {end} :
+#line 44 "generator.l"
 { return Token(TokenType::END, str());         }
             break;
-          case 6: // rule generator.l:46: {word} :
-#line 46 "generator.l"
+          case 6: // rule generator.l:45: {word} :
+#line 45 "generator.l"
 { return Token(TokenType::WORD, str());    }
             break;
-          case 7: // rule generator.l:47: {equ} :
-#line 47 "generator.l"
+          case 7: // rule generator.l:46: {equ} :
+#line 46 "generator.l"
 { return Token(TokenType::EQU, str());         }
             break;
-          case 8: // rule generator.l:48: {colon} :
-#line 48 "generator.l"
+          case 8: // rule generator.l:47: {colon} :
+#line 47 "generator.l"
 { return Token(TokenType::COLON, str());       }
             break;
-          case 9: // rule generator.l:49: {skip} :
-#line 49 "generator.l"
+          case 9: // rule generator.l:48: {skip} :
+#line 48 "generator.l"
 { return Token(TokenType::SKIP, str());        }
             break;
-          case 10: // rule generator.l:50: {comma} :
-#line 50 "generator.l"
+          case 10: // rule generator.l:49: {comma} :
+#line 49 "generator.l"
 { return Token(TokenType::COMMA, str());       }
             break;
-          case 11: // rule generator.l:51: {plus} :
-#line 51 "generator.l"
+          case 11: // rule generator.l:50: {plus} :
+#line 50 "generator.l"
 { return Token(TokenType::PLUS, str());        }
             break;
-          case 12: // rule generator.l:52: {minus} :
-#line 52 "generator.l"
+          case 12: // rule generator.l:51: {minus} :
+#line 51 "generator.l"
 { return Token(TokenType::MINUS, str());       }
             break;
-          case 13: // rule generator.l:53: {star} :
-#line 53 "generator.l"
+          case 13: // rule generator.l:52: {star} :
+#line 52 "generator.l"
 { return Token(TokenType::STAR, str());        }
             break;
-          case 14: // rule generator.l:54: {dollar} :
-#line 54 "generator.l"
+          case 14: // rule generator.l:53: {dollar} :
+#line 53 "generator.l"
 { return Token(TokenType::DOLLAR, str());      }
             break;
-          case 15: // rule generator.l:55: {percentage} :
-#line 55 "generator.l"
-{return Token(TokenType::PERCENTAGE, str()); }
-            break;
-          case 16: // rule generator.l:56: {startparen} :
-#line 56 "generator.l"
+          case 15: // rule generator.l:54: {startparen} :
+#line 54 "generator.l"
 { return Token(TokenType::STARTPAREN, str());      }
             break;
-          case 17: // rule generator.l:57: {endparen} :
-#line 57 "generator.l"
+          case 16: // rule generator.l:55: {endparen} :
+#line 55 "generator.l"
 { return Token(TokenType::ENDPAREN, str());      }
             break;
-          case 18: // rule generator.l:58: {register} :
-#line 58 "generator.l"
+          case 17: // rule generator.l:56: {register} :
+#line 56 "generator.l"
 { return Token(TokenType::REGISTER, str());    }
             break;
-          case 19: // rule generator.l:59: {literal} :
-#line 59 "generator.l"
+          case 18: // rule generator.l:57: {literal} :
+#line 57 "generator.l"
 { return Token(TokenType::LITERAL, str());     }
             break;
-          case 20: // rule generator.l:60: {symbol} :
-#line 60 "generator.l"
+          case 19: // rule generator.l:58: {symbol} :
+#line 58 "generator.l"
 { return Token(TokenType::SYMBOL, str());      }
             break;
-          case 21: // rule generator.l:62: {comment} :
-#line 62 "generator.l"
+          case 20: // rule generator.l:60: {comment} :
+#line 60 "generator.l"
 { start(COMMENT);                        }
             break;
-          case 22: // rule generator.l:63: {blanks} :
-#line 63 "generator.l"
+          case 21: // rule generator.l:61: {blanks} :
+#line 61 "generator.l"
 { }
             break;
-          case 23: // rule generator.l:64: {ignore} :
-#line 64 "generator.l"
+          case 22: // rule generator.l:62: {ignore} :
+#line 62 "generator.l"
 { }
 
 
@@ -225,7 +221,7 @@ Token Lexer::lex(void)
           case 0:
             if (matcher().at_end())
             {
-#line 61 "generator.l"
+#line 59 "generator.l"
 { return Token(TokenType::FILE_END, str());    }
             }
             else
@@ -233,12 +229,12 @@ Token Lexer::lex(void)
               out().put(matcher().input());
             }
             break;
-          case 1: // rule generator.l:67: {line_end} :
-#line 67 "generator.l"
+          case 1: // rule generator.l:65: {line_end} :
+#line 65 "generator.l"
 { start(INITIAL); return Token(TokenType::LINE_END, str()); }
             break;
-          case 2: // rule generator.l:68: {ignore} :
-#line 68 "generator.l"
+          case 2: // rule generator.l:66: {ignore} :
+#line 66 "generator.l"
 { }
 
             break;

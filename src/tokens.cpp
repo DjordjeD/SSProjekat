@@ -18,6 +18,7 @@ ostream& operator<<(std::ostream& out, const TokenType tokenType)
 	case TokenType::MINUS: out << "MINUS"; break;
 	case TokenType::STAR: out << "STAR"; break;
 	case TokenType::DOLLAR: out << "DOLLAR"; break;
+	case TokenType::PERCENTAGE: out << "DOLLAR"; break;
 	case TokenType::STARTPAREN: out << "STARTPAREN"; break;
 	case TokenType::ENDPAREN: out << "ENDPAREN"; break;
 	case TokenType::SEMICOLN: out << "SEMICOLN"; break;
