@@ -143,6 +143,8 @@
     <ClInclude Include="src\assembler.h" />
     <ClInclude Include="src\lex.yy.h" />
     <ClInclude Include="src\parseric.h" />
+    <ClInclude Include="src\secondPassAsm.h" />
+    <ClInclude Include="src\secondPassParser.h" />
     <ClInclude Include="src\sectionTable.h" />
     <ClInclude Include="src\symbol.h" />
     <ClInclude Include="src\tokens.h" />
@@ -164,6 +166,8 @@
     <ClCompile Include="reflex\unicode\language_scripts.cpp" />
     <ClCompile Include="reflex\unicode\letter_scripts.cpp" />
     <ClCompile Include="src\parseric.cpp" />
+    <ClCompile Include="src\secondPassAsm.cpp" />
+    <ClCompile Include="src\secondPassParser.cpp" />
     <ClCompile Include="src\sectionTable.cpp" />
     <ClCompile Include="src\symbol.cpp" />
     <ClCompile Include="src\tokens.cpp" />

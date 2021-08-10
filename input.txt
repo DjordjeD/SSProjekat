@@ -5,6 +5,7 @@
  .word isr_timer
  .word isr_terminal
  .skip 8
+.global idegas
 .extern myStart, myCounter
 .section isr
 .equ term_out, 0xFF00

@@ -12,10 +12,11 @@ static int sidSection = 1;
 
 class Assembler {
 
-	public:
+public:
+
 	vector<Section> sectionList;
 	vector<Symbol> symbolTable;
-	
+
 	Assembler()
 	{
 		Section sec1(-1, "ABSOLUTE");
@@ -23,45 +24,46 @@ class Assembler {
 		Section sec2(0, "UNDEFINED");
 		sectionList.push_back(sec2);
 
-		Symbol section1("ABSOLUTE", "ABSOLUTE",-1);
-		Symbol section2("UNDEFINED", "UNDEFINED",0);
+		Symbol section1("ABSOLUTE", "ABSOLUTE", -1);
+		Symbol section2("UNDEFINED", "UNDEFINED", 0);
 
 		symbolTable.push_back(section1);
 		symbolTable.push_back(section2);
-		
-		absoluteSection = &sectionList[0];
-		undefinedSection = &sectionList[1];
-		currentSection = &sectionList[1];
+
+		absoluteSection = sectionList.at(0);
+		undefinedSection = currentSection = sectionList.at(1);
 		locationCounter = 0;
 	}
 
 	void addSection(string SectionName);
-	Section* getSection(string sectionName);
-	
+	Section getSection(string sectionName);
+	void changeCurrentSection(string sectionName);
+
+
 	void printSectionList();
 	void printSymbolTable();
 
 	void addSymbol(string symbolName);
 	Symbol* getSymbol(string symbolName);
-	Symbol* getSymbol(string symbolName,string sectionName);
-    Symbol* getSymbolCheck(string symbolName);	
+	Symbol* getSymbol(string symbolName, string sectionName);
+	Symbol* getSymbolCheck(string symbolName);
 
-		void addLabel(string text);
-		void addGlobal(string text);
-		void addExtern(string text);
-		void addEqu(string name,string tokenText);
-		void addWord(string text);	
-		void skipDef(int size);
-	
-		string scopePrint(Symbol s);
+	void addLabel(string text);
+	void addGlobal(string text);
+	void addExtern(string text);
+	void addEqu(string name, string tokenText);
+	void addWord(string text);
+	void skipDef(int size);
 
-		void updateLocationCounter(int size);
+	string scopePrint(Symbol s);
 
-private :
-	
+	void updateLocationCounter(int size);
+
+private:
+
 	int locationCounter;
 
-	Section* currentSection;
-	Section* undefinedSection;
-	Section* absoluteSection;
+	Section currentSection;
+	Section undefinedSection;
+	Section absoluteSection;
 };

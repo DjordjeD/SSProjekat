@@ -33,6 +33,12 @@
     <ClInclude Include="src\assembler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\secondPassParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\secondPassAsm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -90,6 +96,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\assembler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\secondPassAsm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\secondPassParser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

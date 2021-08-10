@@ -3,39 +3,46 @@
 
 #include "parseric.h"
 
-class ParserException : public std::exception {
+class ParserException : public exception {
+
+
 	const char* whichError() const noexcept {
 		return "Parsing Error";
 	}
 };
 
 
-void Parser::parse()
+SecondPassAsm Parser::parse()
 {
 	currToken = tokens[currTokenID++];
 	nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
 	int current_line = 0;
 
 
-	while (currToken.getTokenType() != TokenType::FILE_END && currToken.getTokenType() != TokenType::END)
+
+	try
 	{
-		try
+		while (currToken.getTokenType() != TokenType::FILE_END && currToken.getTokenType() != TokenType::END)
 		{
 			current_line++;
 			parseLine();
 		}
-		catch (ParserException parserException)
-		{
-			cout << "Error at line: " << current_line << ". Parser failed" << endl;
-		}
-		
+	}
+	catch (ParserException parserException)
+	{
+		cout << "Error at line: " << current_line << ". Parser failed" << endl;
 	}
 
-	
+
+
+
 	assembler.printSymbolTable();
 	assembler.printSectionList();
+
+
 	// 
-	
+	SecondPassAsm secondAsm(assembler.sectionList, assembler.symbolTable);
+	return secondAsm;
 }
 
 bool isDirective(const Token& token) {
@@ -104,7 +111,7 @@ void Parser::directiveAdd()
 		currToken = tokens[currTokenID++];
 		nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
 		//vidi sta ces sa eksternom
-		while (checkNext(TokenType::COMMA))
+		while (checkCurrentAndSkipNext(TokenType::COMMA))
 		{
 			debug(TokenType::SYMBOL);
 			assembler.addExtern(currToken.text());
@@ -120,15 +127,15 @@ void Parser::directiveAdd()
 
 		debug(TokenType::SYMBOL);
 		//dodaj global
-		assembler.addExtern(currToken.text());
+		assembler.addGlobal(currToken.text());
 
 		currToken = tokens[currTokenID++];
 		nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
 
-		while (checkNext(TokenType::COMMA))
+		while (checkCurrentAndSkipNext(TokenType::COMMA))
 		{
 			debug(TokenType::SYMBOL);
-			assembler.addExtern(currToken.text());
+			assembler.addGlobal(currToken.text());
 			currToken = tokens[currTokenID++];
 			nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
 
@@ -143,7 +150,7 @@ void Parser::directiveAdd()
 		currToken = tokens[currTokenID++];
 		nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
 
-		while (checkNext(TokenType::COMMA))
+		while (checkCurrentAndSkipNext(TokenType::COMMA))
 		{
 			debug({ TokenType::LITERAL, TokenType::SYMBOL });
 			//ubaci currtoken
@@ -199,15 +206,15 @@ void Parser::directiveAdd()
 void Parser::instructionAdd()
 {
 	//cout << "usao u instruction ADD !" << endl;
-	cout << currToken.text();
+	//cout << currToken.text() << endl;
 	string instructionText = currToken.text();
-	
+
 	if (instructionText == "halt" || instructionText == "iret" || instructionText == "ret")
 	{
-		assembler.updateLocationCounter(2);
+		assembler.updateLocationCounter(1);
 	}
 	else if (instructionText == "int" || instructionText == "pop" || instructionText == "push" || instructionText == "not")//call fali mozda
-	{   
+	{
 		if (instructionText == "pop" || instructionText == "push") assembler.updateLocationCounter(3);
 		else assembler.updateLocationCounter(2);
 
@@ -219,17 +226,17 @@ void Parser::instructionAdd()
 		currToken = tokens[currTokenID++];
 		nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
 
-		int incLoc = -1;
+		int incLoc = -1000;
 
-		if (checkNext(TokenType::LITERAL)) incLoc = 5;//jmp 1413
-		else if (checkNext(TokenType::SYMBOL)) incLoc = 5; //jmp Label
-		else if (checkNext(TokenType::PERCENTAGE)) { 
+		if (checkCurrentAndSkipNext(TokenType::LITERAL)) incLoc = 5;//jmp 1413
+		else if (checkCurrentAndSkipNext(TokenType::SYMBOL)) incLoc = 5; //jmp Label
+		else if (checkCurrentAndSkipNext(TokenType::PERCENTAGE)) {
 			//jmp %label pcrelative
-		incLoc = 5; 
-		currToken = tokens[currTokenID++];
-		nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
-		} 
-		else if (checkNext(TokenType::STAR)){
+			incLoc = 5;
+			currToken = tokens[currTokenID++];
+			nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+		}
+		else if (checkCurrentAndSkipNext(TokenType::STAR)) {
 			//kad je star prvi kod jmp
 			currToken = tokens[currTokenID++];
 			nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
@@ -240,31 +247,35 @@ void Parser::instructionAdd()
 			{
 			case TokenType::REGISTER: {
 				//regdir
-				incLoc = 3; 
+				incLoc = 3;
 			} break;
 			case TokenType::STARTPAREN: {
-				//uzmi sledeci
+				//uzmi sledeci jmp *[ri]
 				currToken = tokens[currTokenID++];
 				nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
 
-				if (checkNext(TokenType::REGISTER)) {
+				if (checkCurrentAndSkipNext(TokenType::REGISTER)) {
 					//zasada regind
 
 					currToken = tokens[currTokenID++];
 					nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
 
-					if (checkNext(TokenType::PLUS))//ako nadje plus ima i displacement
+					if (checkCurrentAndSkipNext(TokenType::PLUS))//ako nadje plus ima i displacement
 					{
 						//uzmi displacement
 						currToken = tokens[currTokenID++];
 						nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
-						
-						debug({ TokenType::LITERAL, TokenType::SYMBOL });
-						incLoc=5;
 
-						//uzmi desnu zagradu
-						currToken = tokens[currTokenID++];
-						nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+						debug({ TokenType::LITERAL, TokenType::SYMBOL });
+						incLoc = 5;
+
+						//dok ne uzmes desnu zagradu
+						while (currToken.getTokenType() != TokenType::ENDPAREN)
+						{
+							currToken = tokens[currTokenID++];
+							nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+						}
+
 
 					}
 					else {
@@ -277,21 +288,89 @@ void Parser::instructionAdd()
 					cout << "greska nije bio registar posle startparena";
 				}
 
-				
-			
+
+
 			} break;
-				case TokenType::LITERAL:
-				case TokenType::SYMBOL:  incLoc = 3;  break;
+			case TokenType::LITERAL:
+			case TokenType::SYMBOL:  incLoc = 3;  break;
 			}
 		}
 
 		assembler.updateLocationCounter(incLoc);
 
 	}
-
 	else if (instructionText == "ldr" || instructionText == "str")
 	{
+		int incLoc = -1000;// za koliko se povecava
+		currToken = tokens[currTokenID++];
+		nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
 
+		if (!checkCurrentAndSkipNext(TokenType::REGISTER)) throw ParserException(); // losa instrukcija valjda
+
+		//uzima zarez
+		debug(TokenType::COMMA);
+
+		currToken = tokens[currTokenID++];
+		nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+
+		debug({ TokenType::REGISTER, TokenType::STARTPAREN, TokenType::LITERAL, TokenType::SYMBOL,TokenType::PERCENTAGE, TokenType::DOLLAR });
+
+		switch (currToken.getTokenType())
+		{
+		case TokenType::REGISTER: {
+			//regdir
+			incLoc = 3;
+		}break;
+		case TokenType::DOLLAR: {
+			//absolute ld ri, $label
+			currToken = tokens[currTokenID++];
+			nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+			debug({ TokenType::LITERAL, TokenType::SYMBOL });
+
+			incLoc = 5;
+
+		}break;
+		case TokenType::PERCENTAGE: {
+			//pcrelative ld ri, %label
+			currToken = tokens[currTokenID++];
+			nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+			debug({ TokenType::LITERAL, TokenType::SYMBOL });
+
+			incLoc = 5;
+
+		}break;
+
+		case TokenType::STARTPAREN: {
+
+			currToken = tokens[currTokenID++];
+			nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+			currToken = tokens[currTokenID++];
+			nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+
+			if (checkCurrentAndSkipNext(TokenType::PLUS))
+			{
+				//ld ri, [rj + label - 4]
+				while (currToken.getTokenType() != TokenType::ENDPAREN)
+				{
+					currToken = tokens[currTokenID++];
+					nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+				}
+
+				incLoc = 5;
+			}
+			else if (currToken.getTokenType() == TokenType::ENDPAREN)
+			{
+				incLoc = 3; // regind  ld ri, [rj]
+			}
+
+		}break;
+
+		case TokenType::LITERAL:
+		case TokenType::SYMBOL:  incLoc = 5;  break; //memdir oba ova
+
+		}
+
+		assembler.updateLocationCounter(incLoc);
 
 	}
 	else {
@@ -310,9 +389,12 @@ void Parser::instructionAdd()
 		shl regD, regS regD <= regD << regS; Z C N
 		shr regD, regS regD <= regD >> regS; Z C N*/
 
-		checkNext(TokenType::REGISTER);
-		checkNext(TokenType::COMMA);
-		checkNext(TokenType::REGISTER);
+		currToken = tokens[currTokenID++];
+		nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+
+		checkCurrentAndSkipNext(TokenType::REGISTER);
+		checkCurrentAndSkipNext(TokenType::COMMA);
+
 
 		assembler.updateLocationCounter(3);
 
@@ -346,9 +428,9 @@ void Parser::debug(vector<TokenType> list)
 	throw ParserException();
 }
 
-bool Parser::checkNext(TokenType tokenType)
+bool Parser::checkCurrentAndSkipNext(TokenType tokenType)
 {
-	if (tokenType == currToken.getTokenType()){
+	if (tokenType == currToken.getTokenType()) {
 		currToken = tokens[currTokenID++];
 		nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
 		return 1;

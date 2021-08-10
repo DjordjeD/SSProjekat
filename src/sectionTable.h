@@ -1,11 +1,13 @@
 #pragma once
 
 #include <iostream>
+#include <vector>
 
+using namespace std;
 
 class Section {
 
-	public:
+public:
 	int getID();
 	std::string getSectionName();
 	int getSectionSize();
@@ -16,12 +18,21 @@ class Section {
 	void increaseSize(int size);
 	void increaseSize();
 
+	Section() = default;
 	Section(int _id, std::string _sectionName) : id(_id), sectionName(_sectionName) { sectionSize = 0; }
+	//Section(const Section& s1) {
+	//	id = s1.id;
+	//	sectionName = s1.sectionName;
+	//	sectionSize = s1.sectionSize;
+	//}
 
-	private :
+private:
 
 	int id;
 	std::string sectionName;
 	int sectionSize;
+
+	vector<vector<char>> data;
+	vector<int> offsets;
 
 };

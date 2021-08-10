@@ -1,21 +1,24 @@
 #pragma once
 
-#include "tokens.h"
-#include "assembler.h"
-#include "secondPassAsm.h"
-
+#include "parseric.h"
 #include <iostream>
 #include <vector>
 using namespace std;
 
 
-class Parser {
+
+
+
+
+class SecondPassParser {
 public:
-	SecondPassAsm parse();
-	Parser(vector<Token>& _tokens)
+	void parse();
+
+	SecondPassParser(vector<Token>& _tokens, SecondPassAsm& assembler1)
 	{
 		tokens = _tokens;
 		currTokenID = 0;
+		assembler = assembler1;
 	}
 	int currTokenID;
 	Token currToken;
@@ -24,7 +27,7 @@ public:
 
 private:
 
-	Assembler assembler;
+	SecondPassAsm assembler;
 	void parseLine();
 	void directiveAdd();
 	void instructionAdd();
