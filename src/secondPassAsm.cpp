@@ -1,6 +1,15 @@
 
 #include "secondPassAsm.h"
 
+void SecondPassAsm::printSectionMap()
+{
+	for (auto& i : sectionMap)
+	{
+		cout << i.first << endl;
+		cout << i.second.getSectionName() << endl;
+	}
+}
+
 void SecondPassAsm::printSectionList()
 {
 
@@ -37,4 +46,12 @@ string SecondPassAsm::scopePrint(Symbol s)
 		return "e";
 	}
 	else 	if (s.getSymbolScope() == SymbolScope::LOCAL) return "l";
+}
+
+void SecondPassAsm::addWord(int value)
+{
+}
+
+void SecondPassAsm::addWord(string value)
+{
 }

@@ -21,6 +21,7 @@ public:
 	Token currToken;
 	Token nextToken;
 	vector<Token> tokens;
+	static bool isDirective(const Token& token);
 
 private:
 

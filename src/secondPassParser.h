@@ -1,12 +1,19 @@
 #pragma once
 
-#include "parseric.h"
+#include "tokens.h"
+#include "secondPassAsm.h"
 #include <iostream>
 #include <vector>
 using namespace std;
 
 
+class SecondParserException : public exception {
 
+
+	const char* whichError() const noexcept {
+		return "Parsing Error";
+	}
+};
 
 
 

@@ -19,10 +19,11 @@ public:
 
 	Assembler()
 	{
-		Section sec1(-1, "ABSOLUTE");
-		sectionList.push_back(sec1);
-		Section sec2(0, "UNDEFINED");
-		sectionList.push_back(sec2);
+		Section absoluteSection(-1, "ABSOLUTE");
+		sectionList.push_back(absoluteSection);
+		Section undefinedSection(0, "UNDEFINED");
+		currentSection = undefinedSection;
+		sectionList.push_back(undefinedSection);
 
 		Symbol section1("ABSOLUTE", "ABSOLUTE", -1);
 		Symbol section2("UNDEFINED", "UNDEFINED", 0);
@@ -30,8 +31,6 @@ public:
 		symbolTable.push_back(section1);
 		symbolTable.push_back(section2);
 
-		absoluteSection = sectionList.at(0);
-		undefinedSection = currentSection = sectionList.at(1);
 		locationCounter = 0;
 	}
 

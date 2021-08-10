@@ -45,13 +45,7 @@ SecondPassAsm Parser::parse()
 	return secondAsm;
 }
 
-bool isDirective(const Token& token) {
-	TokenType currType = token.getTokenType();
 
-	return currType == TokenType::SECTION || currType == TokenType::EXTERN || currType == TokenType::GLOBAL || currType == TokenType::SKIP ||
-		currType == TokenType::WORD || currType == TokenType::EQU;
-
-}
 
 void Parser::parseLine()
 {
@@ -441,10 +435,14 @@ bool Parser::checkCurrentAndSkipNext(TokenType tokenType)
 void Parser::defineWord()
 {
 	//ovde si stao treba da se upise wrod
-	/*if (currToken.getTokenType() == TokenType::SYMBOL)
-		assembler.addWord(currToken.text());
-	else
-		assembler.addWord(std::stoi(currToken.text());*/
 
 	assembler.addWord(currToken.text());
+}
+
+bool Parser::isDirective(const Token& token)
+{
+	TokenType currType = token.getTokenType();
+
+	return currType == TokenType::SECTION || currType == TokenType::EXTERN || currType == TokenType::GLOBAL || currType == TokenType::SKIP ||
+		currType == TokenType::WORD || currType == TokenType::EQU;
 }

@@ -32,7 +32,7 @@ private:
 	std::string sectionName;
 	int sectionSize;
 
-	vector<vector<char>> data;
+	vector<vector<int>> data;
 	vector<int> offsets;
 
 };
