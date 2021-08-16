@@ -190,7 +190,7 @@ void SecondPassParser::defineWord()
 	if (currToken.getTokenType() == TokenType::SYMBOL)
 		assembler.addWord(currToken.text());
 	else
-		assembler.addWord(std::stoi(currToken.text());
+		assembler.addWord(std::stoi(currToken.text()));
 
 }
 

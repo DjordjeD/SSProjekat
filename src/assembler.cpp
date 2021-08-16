@@ -16,13 +16,26 @@ void Assembler::addSection(string SectionName)
 	//tek u drugom prolazu on zna koja je sekcija
 	if (symbol->isDefined() == false)
 	{
-		currentSection.increaseSize(locationCounter);
+		currentSection->increaseSize(locationCounter);
 
-		//changeCurrentSection(SectionName);
-		currentSection = getSection(SectionName);// sta ako ne postoji
-		//ne radi promena sekcija
 
-		symbol->setSection(currentSection.getSectionName());
+
+		for (size_t i = 0; i < sectionList.size(); i++)
+		{
+			if (sectionList.at(i).getSectionName() == SectionName)
+				currentSection = &sectionList.at(i);
+		}
+
+
+		//currentSection = getSection(SectionName);
+		////changeCurrentSection(SectionName);
+		//Section temp = getSection(SectionName);// sta ako ne postoji
+		//currentSection.setId(temp.getID());
+		//currentSection.setSectionName(temp.getSectionName());
+		//currentSection.setSectionSize(temp.getSectionSize());
+		////ne radi promena sekcija
+
+		symbol->setSection(currentSection->getSectionName());
 		//symbol->setValue(0);
 		symbol->setIsDefined(true);
 		locationCounter = 0;
@@ -31,23 +44,30 @@ void Assembler::addSection(string SectionName)
 
 }
 
-Section Assembler::getSection(string sectionName)
+Section& Assembler::getSection(string sectionName)
 {
-	for (auto& i : sectionList)
+	/*for (auto& i : sectionList)
 	{
 		if (i.getSectionName() == sectionName) return i;
+	}*/
+
+
+	for (size_t i = 0; i < sectionList.size(); i++)
+	{
+		if (sectionList.at(i).getSectionName() == sectionName) return sectionList.at(i);
 	}
+
 }
 
 void Assembler::changeCurrentSection(string sectionName)
 {
-	sectionList.push_back(currentSection);
-	for (auto& i : sectionList)
-	{
-		if (i.getSectionName() == sectionName) {
-			currentSection = i;
-		}
-	}
+	//sectionList.push_back(currentSection);
+	//for (auto& i : sectionList)
+	//{
+	//	if (i.getSectionName() == sectionName) {
+	//		currentSection = i;
+	//	}
+	//}
 }
 
 void Assembler::printSectionList()
@@ -133,7 +153,7 @@ void Assembler::addLabel(string text)
 	{
 		symbol->setIsDefined(true);
 		symbol->setValue(locationCounter);
-		symbol->setSection(currentSection.getSectionName());
+		symbol->setSection(currentSection->getSectionName());
 		//symbol->setSymbolType(SymbolType::LABEL);
 	}
 }
@@ -166,7 +186,7 @@ void Assembler::addEqu(string name, string tokenText)
 	*/
 	//dodaje lokaciju to fali
 	// ne radi dizanje sekcije JEBEM TI SEKCIJE 
-	absoluteSection.increaseSize(2);
+	absoluteSection->increaseSize(2);
 	symbolTable.push_back(s1);
 }
 
@@ -201,5 +221,5 @@ string Assembler::scopePrint(Symbol s)
 void Assembler::updateLocationCounter(int size)
 {
 	locationCounter += size;
-	currentSection.increaseSize(size);
+	currentSection->increaseSize(size);
 }

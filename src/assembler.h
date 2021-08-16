@@ -19,11 +19,14 @@ public:
 
 	Assembler()
 	{
-		Section absoluteSection(-1, "ABSOLUTE");
-		sectionList.push_back(absoluteSection);
-		Section undefinedSection(0, "UNDEFINED");
-		currentSection = undefinedSection;
-		sectionList.push_back(undefinedSection);
+		Section absoluteSection1(-1, "ABSOLUTE");
+		absoluteSection = &absoluteSection1;
+		sectionList.push_back(absoluteSection1);
+		//absoluteSection = &sectionList.at(0);
+		Section undefinedSection1(0, "UNDEFINED");
+		currentSection = &undefinedSection1;
+		undefinedSection = &undefinedSection1;
+		sectionList.push_back(undefinedSection1);
 
 		Symbol section1("ABSOLUTE", "ABSOLUTE", -1);
 		Symbol section2("UNDEFINED", "UNDEFINED", 0);
@@ -35,7 +38,7 @@ public:
 	}
 
 	void addSection(string SectionName);
-	Section getSection(string sectionName);
+	Section& getSection(string sectionName);
 	void changeCurrentSection(string sectionName);
 
 
@@ -58,11 +61,15 @@ public:
 
 	void updateLocationCounter(int size);
 
+
+	Section* currentSection;
+	Section* undefinedSection;
+	Section* absoluteSection;
+
+
 private:
 
 	int locationCounter;
 
-	Section currentSection;
-	Section undefinedSection;
-	Section absoluteSection;
+
 };
