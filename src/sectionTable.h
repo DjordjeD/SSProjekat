@@ -38,6 +38,8 @@ public:
 	//	sectionSize = section.sectionSize;
 
 	//}
+	vector<vector<int>> data;
+	vector<int> offsets;
 
 private:
 
@@ -45,7 +47,6 @@ private:
 	std::string sectionName;
 	int sectionSize;
 
-	vector<vector<int>> data;
-	vector<int> offsets;
+
 
 };

@@ -10,14 +10,6 @@ void SecondPassAsm::printSectionMap()
 	}
 }
 
-void SecondPassAsm::printSectionList()
-{
-
-	for (auto& i : sectionList)
-	{
-		cout << i.getID() << " " << i.getSectionName() << " " << i.getSectionSize() << endl;
-	}
-}
 
 
 
@@ -48,10 +40,99 @@ string SecondPassAsm::scopePrint(Symbol s)
 	else 	if (s.getSymbolScope() == SymbolScope::LOCAL) return "l";
 }
 
+void SecondPassAsm::addWord(string name)
+{
+	Symbol* symbol = getSymbol(name);
+	if (symbol != NULL)
+	{
+		if (symbol->getSection() == "ABSOLUTE")
+		{
+
+			sectionMap[currentSection].data.at(sectionMap[currentSection].offsets.size()).push_back(symbol->getValue());
+			sectionMap[currentSection].data.at(sectionMap[currentSection].offsets.size()).push_back(symbol->getValue());
+			sectionMap[currentSection].offsets.push_back(locationCounter);
+		}
+		else
+		{
+			if (symbol->isDefined())
+			{
+				if (symbol->getSymbolScope() == SymbolScope::LOCAL)
+				{
+
+					sectionMap[currentSection].data.at(sectionMap[currentSection].offsets.size()).push_back(symbol->getValue());
+					sectionMap[currentSection].data.at(sectionMap[currentSection].offsets.size()).push_back(symbol->getValue());
+					sectionMap[currentSection].offsets.push_back(locationCounter);
+
+
+					RelocationRecord temp;
+					temp.relocationType = "R_HYP_16";
+					temp.isData = true;
+					temp.sectionName = currentSection;
+					temp.symbolName = symbol->getSection();//ovde uzima sekciju jer je lokalan
+					temp.offset = locationCounter;
+
+					relocationTable.push_back(temp);
+				}
+				else
+				{
+					//OVDE TREBA DA SE DODAJU NULE
+					sectionMap[currentSection].data.at(sectionMap[currentSection].offsets.size()).push_back(symbol->getValue());
+					sectionMap[currentSection].data.at(sectionMap[currentSection].offsets.size()).push_back(symbol->getValue());
+					sectionMap[currentSection].offsets.push_back(locationCounter);
+
+
+					RelocationRecord temp;
+					temp.relocationType = "R_HYP_16";
+					temp.isData = true;
+					temp.sectionName = currentSection;
+					temp.symbolName = symbol->getSymbolName();//ovde uzima simbol
+					temp.offset = locationCounter;
+
+					relocationTable.push_back(temp);
+				}
+			}
+			else
+			{
+				//symbol niej definisan, ima NULE
+				sectionMap[currentSection].data.at(sectionMap[currentSection].offsets.size()).push_back(symbol->getValue());
+				sectionMap[currentSection].data.at(sectionMap[currentSection].offsets.size()).push_back(symbol->getValue());
+				sectionMap[currentSection].offsets.push_back(locationCounter);
+
+
+				RelocationRecord temp;
+				temp.relocationType = "R_HYP_16";
+				temp.isData = true;
+				temp.sectionName = currentSection;
+				temp.symbolName = symbol->getSymbolName();
+				temp.offset = locationCounter;
+
+				relocationTable.push_back(temp);
+			}
+		}
+		//sectionMap[currentSection]
+	}
+	else {
+		cout << "greska";
+	}
+
+
+}
+
 void SecondPassAsm::addWord(int value)
 {
 }
 
-void SecondPassAsm::addWord(string value)
+void SecondPassAsm::addSection(string sectionName)
 {
+	locationCounter = 0;
+	currentSection = sectionName;
+}
+
+Symbol* SecondPassAsm::getSymbol(string symbolName)
+{
+	for (auto& i : symbolTable)
+	{
+		if (i.getSymbolName() == symbolName) return &i;
+	}
+	return NULL;
 }

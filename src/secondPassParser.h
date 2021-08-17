@@ -42,7 +42,7 @@ private:
 	void debug(TokenType tokenType);
 	void debug(vector<TokenType> list);
 	bool checkCurrentAndSkipNext(TokenType tokenType);
-	void defineWord();
+	void defineWord(string name);
 
 
 

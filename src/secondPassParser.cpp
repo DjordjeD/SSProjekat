@@ -81,7 +81,7 @@ void SecondPassParser::directiveAdd()
 		debug(TokenType::SYMBOL);
 
 		//preksace se sekcija
-		//assembler.addSection(currToken.text());
+		assembler.addSection(currToken.text());
 
 		currToken = tokens[currTokenID++];
 		nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
@@ -130,7 +130,7 @@ void SecondPassParser::directiveAdd()
 
 		debug({ TokenType::LITERAL, TokenType::SYMBOL });
 		//ubaci token
-		defineWord();
+		defineWord(currToken.text());
 
 
 		currToken = tokens[currTokenID++];
@@ -140,7 +140,7 @@ void SecondPassParser::directiveAdd()
 		{
 			debug({ TokenType::LITERAL, TokenType::SYMBOL });
 			//ubaci currtoken
-			defineWord();
+			defineWord(currToken.text());
 			currToken = tokens[currTokenID++];
 			nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
 
@@ -185,7 +185,7 @@ bool SecondPassParser::checkCurrentAndSkipNext(TokenType tokenType)
 	return 0;
 }
 
-void SecondPassParser::defineWord()
+void SecondPassParser::defineWord(string name)
 {
 	if (currToken.getTokenType() == TokenType::SYMBOL)
 		assembler.addWord(currToken.text());

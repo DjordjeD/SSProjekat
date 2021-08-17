@@ -18,26 +18,20 @@ class SecondPassAsm
 
 public:
 
-	vector<Section> sectionList;
+	//vector<Section> sectionList;
 	vector<Symbol> symbolTable;
 	vector<RelocationRecord> relocationTable;
 	map<string, Section> sectionMap;
 
-	SecondPassAsm(vector<Section> sectionList1, vector<Symbol> symbolTable1)
+	SecondPassAsm(map<string, Section> sectionList1, vector<Symbol> symbolTable1)
 	{
-		copy(sectionList1.begin(), sectionList1.end(), back_inserter(sectionList));
-		copy(symbolTable1.begin(), symbolTable1.end(), back_inserter(symbolTable));
 
-		for (auto& i : sectionList)
+		for (auto& i : sectionList1)
 		{
-			RelocationRecord r;
-			r.sectionName = i.getSectionName();
-			relocationTable.push_back(r);
-			//napuni mapu
-			sectionMap[i.getSectionName()] = i;
+			sectionMap[i.first] = i.second;
 		}
-
-
+		//copy(sectionList1.begin(), sectionList1.end(), back_inserter(sectionMap));
+		copy(symbolTable1.begin(), symbolTable1.end(), back_inserter(symbolTable));
 
 
 	};
@@ -45,12 +39,18 @@ public:
 	SecondPassAsm() = default;
 
 	void printSectionMap();
-	void printSectionList();
+	//void printSectionList();
 	void printSymbolTable();
 	string scopePrint(Symbol s);
 
 	void addWord(int value);
-	void addWord(string value);
+	void addWord(string name);
+	void addSection(string sectionName);
+	Symbol* getSymbol(string symbolName);
+
+
+	string currentSection;
+	int locationCounter;
 
 private:
 
