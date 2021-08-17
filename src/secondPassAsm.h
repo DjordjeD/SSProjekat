@@ -2,6 +2,17 @@
 #include "assembler.h"
 #include <map>
 
+
+class AssemblerException : public std::exception
+{
+public:
+	AssemblerException(std::string msg);
+	const char* what() const noexcept;
+private:
+	std::string _msg;
+};
+
+
 struct RelocationRecord
 {
 	bool isData;
@@ -48,7 +59,8 @@ public:
 	void addSection(string sectionName);
 	Symbol* getSymbol(string symbolName);
 
-
+	void addEqu(string symbolName, string tokenText);
+	void skipDef(int value);
 	string currentSection;
 	int locationCounter;
 

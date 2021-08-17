@@ -3,28 +3,35 @@
 void SecondPassParser::parse()
 {
 
-	//currToken = tokens[currTokenID++];
-	//nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
-	//int current_line = 0;
+	currToken = tokens[currTokenID++];
+	nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+	int current_line = 0;
 
 
 
-	//try
-	//{
-	//	while (currToken.getTokenType() != TokenType::FILE_END && currToken.getTokenType() != TokenType::END)
-	//	{
-	//		current_line++;
-	//		parseLine();
-	//	}
-	//}
-	//catch (SecondParserException parserException)
-	//{
-	//	cout << "Error at line: " << current_line << ". Parser failed" << endl;
-	//}
+	try
+	{
+		while (currToken.getTokenType() != TokenType::FILE_END && currToken.getTokenType() != TokenType::END)
+		{
+			current_line++;
+			parseLine();
+		}
+	}
+	catch (SecondParserException parserException)
+	{
+		cout << "Error at line: " << current_line << ". Parser failed" << endl;
+	}
+	catch (AssemblerException assemblerException)
+	{
+		cout << "Error at line: " << current_line << ". ASM failed  " << assemblerException.what() << endl;
+	}
 
 	assembler.printSectionMap();
 	//assembler.printSectionList();
-	//assembler.printSymbolTable();
+	assembler.printSymbolTable();
+
+	cout << "sectionMAP" << endl;
+	assembler.printSectionMap();
 
 }
 
@@ -148,12 +155,55 @@ void SecondPassParser::directiveAdd()
 
 
 	}
+	else if (token.getTokenType() == TokenType::EQU) {
+		/*
+		currToken = tokens[currTokenID++];
+		nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+		*/
+
+
+		debug(TokenType::SYMBOL);
+
+		//sacuvaj simbol
+
+		string symbolNameTemp = currToken.text();
+
+		//nova fja koja odmah ubacuje value uvek je value, Local, absolute, ime, id dodat.
+
+		currToken = tokens[currTokenID++];
+		nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+
+		currToken = tokens[currTokenID++];
+		nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+
+		debug(TokenType::LITERAL);
+
+		assembler.addEqu(symbolNameTemp, currToken.text());//nekako da zna absolute sekciju
+		//dodaj vrednost simbolu
+		currToken = tokens[currTokenID++];
+		nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+
+
+	}
+	else if (token.getTokenType() == TokenType::SKIP) {
+		debug(TokenType::LITERAL);
+		assembler.skipDef(std::stoi(currToken.text()));
+		currToken = tokens[currTokenID++];
+		nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+
+	}
+
 
 
 }
 
 void SecondPassParser::instructionAdd()
 {
+	while (currToken.getTokenType() != TokenType::LINE_END)
+	{
+		currToken = tokens[currTokenID++];
+		nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+	}
 }
 
 void SecondPassParser::debug(TokenType tokenType)

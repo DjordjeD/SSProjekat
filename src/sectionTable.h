@@ -38,7 +38,7 @@ public:
 	//	sectionSize = section.sectionSize;
 
 	//}
-	vector<vector<int>> data;
+	vector<vector<char>> data;
 	vector<int> offsets;
 
 private:
