@@ -16,10 +16,11 @@ private:
 struct RelocationRecord
 {
 	bool isData;
-	int offset;
-	string sectionName;
+	int offset; //gde krece offset
+	string sectionName; //trenutna sekcija, gde da trazi relokaciju
 	string relocationType;
 	string symbolName;
+	//bitno je da se razlikuje da li je offset u odnosu na sekciju ili u odnosu na sve sekcije (kod linkera)
 };
 
 
@@ -63,8 +64,13 @@ public:
 	void skipDef(int value);
 	string currentSection;
 	int locationCounter;
+	void updateSectionMap(vector<char> data, int locationCounterInc);
+	void updateSectionMap(int offset, vector<char> data, int locationCounterInc);
+	void updateSectionMap(int offset, vector<char> data, int locationCounterInc, string section);
+	int instructionBinary(string insTxt);
 
-private:
+	int absoluteSymbolValue(string symbolName);
+	int pcRelativeSymbolValue(string symbolName);
 
 
 

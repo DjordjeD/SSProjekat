@@ -21,9 +21,25 @@ void SecondPassAsm::printSectionMap()
 			cout << endl;
 		}
 
+		cout << endl;
+
+		cout << "Relocation for " << i.first << endl;
+		cout << "Offset " << "\t" << "IsData" << "\t" << "relocationType" << "\t" << "sectionName" << "\t" << "symbolName(value)" << endl;
+		for (auto& j : relocationTable)
+		{
+
+			if (i.first == j.sectionName) {
+
+
+				cout << j.offset << "\t" << j.isData << "\t" << j.relocationType << "\t" << j.sectionName << "\t\t" << j.symbolName << endl;
+			}
+		}
 		cout << endl << endl;
 	}
+
 }
+
+
 
 
 
@@ -35,7 +51,7 @@ void SecondPassAsm::printSymbolTable()
 
 	for (auto& i : symbolTable)
 	{
-		cout << hex << i.getValue() << " " << scopePrint(i) << " " << i.getSection() << " " << i.getSymbolName() << " " << i.getNumberID() << endl;
+		cout << hex << i.getValue() << "\t " << scopePrint(i) << "\t " << i.getSection() << "\t " << i.getSymbolName() << "\t " << i.getNumberID() << endl;
 	}
 	cout << endl << " END OF SYMBOL TABLE" << endl << endl;
 }
@@ -66,7 +82,7 @@ void SecondPassAsm::addWord(string name)
 	Symbol* symbol = getSymbol(name);
 	if (symbol != NULL)
 	{
-		if (symbol->getSection() == "ABSOLUTE")
+		if (symbol->getSection() == "ABSOLUTE")// valjda samo za equ
 		{
 			vector<char> dataTemp;
 			dataTemp.push_back(symbol->getValue() & 0xff);
@@ -93,7 +109,7 @@ void SecondPassAsm::addWord(string name)
 					temp.relocationType = "R_HYP_16";
 					temp.isData = true;
 					temp.sectionName = currentSection;
-					temp.symbolName = symbol->getSection();//ovde uzima sekciju jer je lokalan, to je dovoljno
+					temp.symbolName = symbol->getSection();//ovde uzima sekciju jer je lokalan, to je dovoljno alternativno broj sekcije
 					temp.offset = locationCounter;
 
 					relocationTable.push_back(temp);
@@ -205,6 +221,162 @@ void SecondPassAsm::skipDef(int value)
 	sectionMap[currentSection].offsets.push_back(locationCounter);
 
 	locationCounter += value;
+}
+
+void SecondPassAsm::updateSectionMap(vector<char> data, int locationCounterInc)
+{
+	sectionMap[currentSection].data.push_back(data);
+	sectionMap[currentSection].offsets.push_back(locationCounter);
+
+	locationCounter += locationCounterInc;
+}
+
+void SecondPassAsm::updateSectionMap(int offset, vector<char> data, int locationCounterInc)
+{
+	sectionMap[currentSection].data.push_back(data);
+	sectionMap[currentSection].offsets.push_back(offset);
+
+	locationCounter += locationCounterInc;
+}
+
+void SecondPassAsm::updateSectionMap(int offset, vector<char> data, int locationCounterInc, string section)
+{
+	sectionMap[section].data.push_back(data);
+	sectionMap[section].offsets.push_back(offset);
+
+	locationCounter += locationCounterInc;
+}
+
+int SecondPassAsm::instructionBinary(string insTxt)
+{
+	if (insTxt == "int") return 0x10;
+	else if (insTxt == "pop") return 0xA0;
+	else if (insTxt == "push") return 0xB0;
+	else if (insTxt == "not") return 0x80;
+
+
+	else if (insTxt == "halt") return 0x00;
+	else if (insTxt == "iret") return 0x20;
+	else if (insTxt == "ret") return 0x40;
+
+
+	else if (insTxt == "call") return 0x30;
+	else if (insTxt == "jmp") return 0x50;
+	else if (insTxt == "jeq") return 0x51;
+	else if (insTxt == "jne") return 0x52;
+	else if (insTxt == "jgt") return 0x53;
+
+
+	else if (insTxt == "xchg")return 0x60;
+	else if (insTxt == "add") return 0x70;
+	else if (insTxt == "sub") return 0x71;
+	else if (insTxt == "mul") return 0x72;
+	else if (insTxt == "div") return 0x73;
+	else if (insTxt == "cmp") return 0x74;
+	else if (insTxt == "and") return 0x81;
+	else if (insTxt == "or")  return 0x82;
+	else if (insTxt == "xor") return 0x83;
+	else if (insTxt == "test")return 0x84;
+	else if (insTxt == "shl") return 0x90;
+	else if (insTxt == "shr") return 0x91;
+
+	else if (insTxt == "ldr") return 0xA0;
+	else if (insTxt == "str") return 0xB0;
+}
+
+int SecondPassAsm::absoluteSymbolValue(string symbolName)
+{
+
+	Symbol* symbol = getSymbol(symbolName);
+
+	if (symbol != NULL)
+	{
+		if (symbol->getSection() == "ABSOLUTE")
+			return symbol->getValue();
+		else {
+
+			RelocationRecord temp;
+			temp.relocationType = "R_HYP_16";
+			temp.isData = false;
+			temp.sectionName = currentSection;
+			temp.offset = locationCounter + 4;
+
+			if (symbol->getSymbolScope() == SymbolScope::EXTERN || symbol->getSymbolScope() == SymbolScope::GLOBAL)
+			{
+				temp.symbolName = symbol->getSymbolName();
+				relocationTable.push_back(temp);
+				return 0;
+			}
+			else {
+				temp.symbolName = symbol->getSection();//ovde uzima simbol
+				relocationTable.push_back(temp);
+				return symbol->getValue();
+			}
+		}
+	}
+	else throw AssemblerException("simbol ne postoji u absolute symbol value" + symbol->getSymbolName());
+
+
+	return -1000;
+}
+
+int SecondPassAsm::pcRelativeSymbolValue(string symbolName)
+{
+
+	Symbol* symbol = getSymbol(symbolName);
+
+	if (symbol != NULL)
+	{
+		RelocationRecord temp;
+
+		if (symbol->getSection() == "ABSOLUTE") {
+
+			temp.relocationType = "R_HYP_16_PC";
+			temp.isData = false;
+			temp.sectionName = currentSection;
+			temp.offset = locationCounter + 4;
+			temp.symbolName = symbol->getSymbolName();
+
+			relocationTable.push_back(temp);
+
+			return -2;
+		}
+		else {
+
+
+			temp.relocationType = "R_HYP_16_PC";
+			temp.isData = false;
+			temp.sectionName = currentSection;
+			temp.offset = locationCounter + 4;
+
+			if (symbol->getSymbolScope() == SymbolScope::EXTERN || symbol->getSymbolScope() == SymbolScope::GLOBAL)
+			{
+				temp.symbolName = symbol->getSymbolName();
+				relocationTable.push_back(temp);
+				return -2; // linker posle popuni lagano
+			}
+			else {
+
+				if (currentSection != symbol->getSection())// razlciite sekcije
+				{
+					temp.symbolName = symbol->getSection();
+					relocationTable.push_back(temp);
+					return symbol->getValue() - 2; // vrednost simbola fiksna, linker popravlja sekciju
+				}
+				else {
+					//iste sekcije uvek ista prica
+
+					temp.symbolName = symbol->getSection();
+					relocationTable.push_back(temp);
+					return symbol->getValue() - 2 - (locationCounter + 3);
+				}
+			}
+		}
+	}
+	else throw AssemblerException("simbol ne postoji u pcrelative symbol value" + symbol->getSymbolName());
+
+
+	return -1000;
 }
 
 AssemblerException::AssemblerException(std::string msg)

@@ -26,7 +26,7 @@ void SecondPassParser::parse()
 		cout << "Error at line: " << current_line << ". ASM failed  " << assemblerException.what() << endl;
 	}
 
-	assembler.printSectionMap();
+	//assembler.printSectionMap();
 	//assembler.printSectionList();
 	assembler.printSymbolTable();
 
@@ -199,11 +199,506 @@ void SecondPassParser::directiveAdd()
 
 void SecondPassParser::instructionAdd()
 {
-	while (currToken.getTokenType() != TokenType::LINE_END)
+	//cout << "usao u instruction ADD !" << endl;
+	//cout << currToken.text() << endl;
+	string instructionText = currToken.text();
+
+
+	if (instructionText == "halt" || instructionText == "iret" || instructionText == "ret")
+	{
+		vector <char> dataVector;
+		dataVector.push_back(assembler.instructionBinary(instructionText));
+		assembler.updateSectionMap(dataVector, 1);
+	}
+	else if (instructionText == "int" || instructionText == "not" || instructionText == "pop" || instructionText == "push")//call fali mozda
+	{
+		vector <char> dataVector;
+		currToken = tokens[currTokenID++];
+		nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+
+		int registerNum;
+		registerNum = currToken.text().at(1) - '0';
+		if (instructionText == "int" || instructionText == "not") {
+			dataVector.push_back(assembler.instructionBinary(instructionText));
+			dataVector.push_back((registerNum << 4) + 15);
+			assembler.updateSectionMap(dataVector, 2); // uvecava za 2 , trenutnu sekciju ubacuje offset = location counter, datavector u data
+		}
+		else if (instructionText == "pop")
+		{
+			dataVector.push_back(assembler.instructionBinary(instructionText));
+			dataVector.push_back((registerNum << 4) + 6);
+			dataVector.push_back(0x42);
+			assembler.updateSectionMap(dataVector, 3);
+		}
+		else if (instructionText == "push")
+		{
+			dataVector.push_back(assembler.instructionBinary(instructionText));
+			dataVector.push_back((registerNum << 4) + 6);
+			dataVector.push_back(0x12);
+			assembler.updateSectionMap(dataVector, 3);
+		}
+
+	}
+	else if (instructionText == "jmp" || instructionText == "jeq" || instructionText == "jne" || instructionText == "jgt" || instructionText == "call")
 	{
 		currToken = tokens[currTokenID++];
 		nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+
+		int incLoc = -1000;
+
+		if (checkCurrentAndSkipNext(TokenType::SYMBOL)) {
+			incLoc = 5; //jmp simbol
+
+			vector <char> dataVector;
+			int regDesc = 0xFF;
+			int adrMode = 0;
+
+			int value = assembler.absoluteSymbolValue(tokens[currTokenID - 2].text());
+			dataVector.push_back(assembler.instructionBinary(instructionText));
+			dataVector.push_back(regDesc);
+			dataVector.push_back(adrMode);
+			dataVector.push_back((value >> 8) & 0xff);
+			dataVector.push_back(value & 0xff);
+
+			assembler.updateSectionMap(dataVector, incLoc);
+
+		}
+		else if (checkCurrentAndSkipNext(TokenType::LITERAL))
+		{
+			incLoc = 5; //jmp Label
+
+			vector <char> dataVector;
+			int regDesc = 0xFF;
+			int adrMode = 0;
+			int value = stoi(tokens[currTokenID - 2].text(), 0, 16);
+
+			dataVector.push_back(assembler.instructionBinary(instructionText));
+			dataVector.push_back(regDesc);
+			dataVector.push_back(adrMode);
+			dataVector.push_back((value >> 8) & 0xff);
+			dataVector.push_back(value & 0xff);
+
+			assembler.updateSectionMap(dataVector, incLoc);
+		}
+
+		else if (checkCurrentAndSkipNext(TokenType::PERCENTAGE)) {
+			//jmp %label pcrelative
+			incLoc = 5;
+			/*currToken = tokens[currTokenID++];
+			nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();*/
+
+			vector <char> dataVector;
+			int regDesc = 0xF7;
+			int adrMode = 0x05;
+
+			int value = assembler.pcRelativeSymbolValue(currToken.text());
+			dataVector.push_back(assembler.instructionBinary(instructionText));
+			dataVector.push_back(regDesc);
+			dataVector.push_back(adrMode);
+			dataVector.push_back((value >> 8) & 0xff);
+			dataVector.push_back(value & 0xff);
+
+			assembler.updateSectionMap(dataVector, incLoc);
+
+		}
+		else if (checkCurrentAndSkipNext(TokenType::STAR)) { //jmp *label
+			//kad je star prvi kod jmp
+			currToken = tokens[currTokenID++];
+			nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+			debug({ TokenType::REGISTER, TokenType::STARTPAREN, TokenType::LITERAL, TokenType::SYMBOL });
+
+
+			switch (currToken.getTokenType())
+			{
+			case TokenType::REGISTER: {
+				//regdir
+				incLoc = 3;
+				vector <char> dataVector;
+				int regDesc = 0xF0 + (currToken.text().at(1) - '0');
+				int adrMode = 0x01;
+
+				int value = assembler.pcRelativeSymbolValue(currToken.text());
+				dataVector.push_back(assembler.instructionBinary(instructionText));
+				dataVector.push_back(regDesc);
+				dataVector.push_back(adrMode);
+
+				assembler.updateSectionMap(dataVector, incLoc);
+			} break;
+			case TokenType::STARTPAREN: {
+				//uzmi sledeci jmp *[ri]
+				currToken = tokens[currTokenID++];
+				nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+
+				if (checkCurrentAndSkipNext(TokenType::REGISTER)) {
+					//zasada regind
+
+					currToken = tokens[currTokenID++];
+					nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+
+					if (checkCurrentAndSkipNext(TokenType::PLUS))//ako nadje plus ima i displacement
+					{
+						//uzmi displacement
+						currToken = tokens[currTokenID++];
+						nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+
+						debug({ TokenType::LITERAL, TokenType::SYMBOL });
+						incLoc = 5;
+						vector <char> dataVector;
+						int regDesc = 0xF0 + (tokens[currTokenID - 1].text().at(1) - '0');
+						int adrMode = 0x03;
+						int value;
+
+
+
+						if (currToken.getTokenType() == TokenType::LITERAL)
+						{
+							value = stoi(currToken.text(), 0, 16);
+						}
+						else
+						{
+							//symbol
+							value = assembler.absoluteSymbolValue(currToken.text());
+						}
+
+
+						dataVector.push_back(assembler.instructionBinary(instructionText));
+						dataVector.push_back(regDesc);
+						dataVector.push_back(adrMode);
+						dataVector.push_back((value >> 8) & 0xff);
+						dataVector.push_back(value & 0xff);
+
+						assembler.updateSectionMap(dataVector, incLoc);
+
+						//dok ne uzmes desnu zagradu
+						while (currToken.getTokenType() != TokenType::ENDPAREN)
+						{
+							currToken = tokens[currTokenID++];
+							nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+						}
+
+
+					}
+					else { // ovde je zagrada onda  (regind)
+
+						incLoc = 3;
+						vector <char> dataVector;
+						int regDesc = 0xF0 + (tokens[currTokenID - 1].text().at(1) - '0');
+						int adrMode = 0x02;
+
+						//int value = assembler.pcRelativeSymbolValue(currToken.text());
+						dataVector.push_back(assembler.instructionBinary(instructionText));
+						dataVector.push_back(regDesc);
+						dataVector.push_back(adrMode);
+
+						assembler.updateSectionMap(dataVector, incLoc);
+					}
+
+				}
+				else
+				{
+					throw SecondParserException();
+				}
+
+
+
+			} break;
+			case TokenType::LITERAL: {
+
+				incLoc = 3; //jmp *Label
+
+				vector <char> dataVector;
+				int regDesc = 0xFF;
+				int adrMode = 0x04;
+				int value = stoi(currToken.text(), 0, 16);
+
+				dataVector.push_back(assembler.instructionBinary(instructionText));
+				dataVector.push_back(regDesc);
+				dataVector.push_back(adrMode);
+				dataVector.push_back((value >> 8) & 0xff);
+				dataVector.push_back(value & 0xff);
+
+				assembler.updateSectionMap(dataVector, incLoc);
+
+			} break;
+			case TokenType::SYMBOL: {
+
+				incLoc = 3; //jmp *symbol
+
+				vector <char> dataVector;
+				int regDesc = 0xFF;
+				int adrMode = 0x04;
+				int value = assembler.absoluteSymbolValue(currToken.text());
+
+				dataVector.push_back(assembler.instructionBinary(instructionText));
+				dataVector.push_back(regDesc);
+				dataVector.push_back(adrMode);
+				dataVector.push_back((value >> 8) & 0xff);
+				dataVector.push_back(value & 0xff);
+
+				assembler.updateSectionMap(dataVector, incLoc);
+
+			};  break;
+
+
+			}
+		}
+
+		//assembler.updateLocationCounter(incLoc);
+
 	}
+	else if (instructionText == "ldr" || instructionText == "str")
+	{
+		int incLoc = -1000;// za koliko se povecava
+		currToken = tokens[currTokenID++];
+		nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+
+		//if (!checkCurrentAndSkipNext(TokenType::REGISTER)) throw  SecondParserException(); // losa instrukcija valjda
+
+		if (currToken.getTokenType() != TokenType::REGISTER) throw  SecondParserException();
+
+		int regDesc = currToken.text().at(1) - '0';
+		regDesc <<= 4; // ovo puni source
+
+		currToken = tokens[currTokenID++];
+		nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+
+		//uzima zarez
+		debug(TokenType::COMMA);
+
+		currToken = tokens[currTokenID++];
+		nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+
+		debug({ TokenType::REGISTER, TokenType::STARTPAREN, TokenType::LITERAL, TokenType::SYMBOL,TokenType::PERCENTAGE, TokenType::DOLLAR });
+
+		switch (currToken.getTokenType())
+		{
+		case TokenType::REGISTER: {
+			//regdir
+			incLoc = 3;
+			vector <char> dataVector;
+			regDesc += (currToken.text().at(1) - '0'); //puni desni registar zbog toga sto sam siftovao gore
+			int adrMode = 0x01;
+
+			dataVector.push_back(assembler.instructionBinary(instructionText));
+			dataVector.push_back(regDesc);
+			dataVector.push_back(adrMode);
+
+			assembler.updateSectionMap(dataVector, incLoc);
+		}break;
+		case TokenType::DOLLAR: {
+			//absolute ld ri, $label
+			currToken = tokens[currTokenID++];
+			nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+			debug({ TokenType::LITERAL, TokenType::SYMBOL });
+
+			incLoc = 5;
+			vector <char> dataVector;
+			regDesc += 0xF;
+			int adrMode = 0;
+			int value;
+
+
+
+			if (currToken.getTokenType() == TokenType::LITERAL)
+			{
+				value = stoi(currToken.text(), 0, 16);
+			}
+			else
+			{
+				//symbol
+				value = assembler.absoluteSymbolValue(currToken.text());
+			}
+
+
+			dataVector.push_back(assembler.instructionBinary(instructionText));
+			dataVector.push_back(regDesc);
+			dataVector.push_back(adrMode);
+			dataVector.push_back((value >> 8) & 0xff);
+			dataVector.push_back(value & 0xff);
+
+
+			assembler.updateSectionMap(dataVector, incLoc);
+
+		}break;
+		case TokenType::PERCENTAGE: {
+			//pcrelative ld ri, %label
+			incLoc = 5;
+			currToken = tokens[currTokenID++];
+			nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+
+			vector <char> dataVector;
+			regDesc += 0x7;
+			int adrMode = 0x03;
+
+			int value = assembler.pcRelativeSymbolValue(currToken.text());
+			dataVector.push_back(assembler.instructionBinary(instructionText));
+			dataVector.push_back(regDesc);
+			dataVector.push_back(adrMode);
+			dataVector.push_back((value >> 8) & 0xff);
+			dataVector.push_back(value & 0xff);
+
+			assembler.updateSectionMap(dataVector, incLoc);
+
+		}break;
+
+		case TokenType::STARTPAREN: {
+
+			/*		currToken = tokens[currTokenID++];
+					nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+					currToken = tokens[currTokenID++];
+					nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();*/
+
+			currToken = tokens[currTokenID++];// registar 
+			nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+
+			regDesc += (currToken.text().at(1) - '0');
+
+			currToken = tokens[currTokenID++];// plus ili endparen
+			nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+
+			if (checkCurrentAndSkipNext(TokenType::PLUS))
+			{
+				//ld ri, [rj + label - 4]
+
+				debug({ TokenType::LITERAL, TokenType::SYMBOL });
+				incLoc = 5;
+				vector <char> dataVector;
+				int adrMode = 0x03;
+				int value;
+
+
+
+				if (currToken.getTokenType() == TokenType::LITERAL)
+				{
+					value = stoi(currToken.text(), 0, 16);
+				}
+				else
+				{
+					//symbol
+					value = assembler.absoluteSymbolValue(currToken.text());
+				}
+
+
+				dataVector.push_back(assembler.instructionBinary(instructionText));
+				dataVector.push_back(regDesc);
+				dataVector.push_back(adrMode);
+				dataVector.push_back((value >> 8) & 0xff);
+				dataVector.push_back(value & 0xff);
+
+				assembler.updateSectionMap(dataVector, incLoc);
+
+
+
+				while (currToken.getTokenType() != TokenType::ENDPAREN)
+				{
+					currToken = tokens[currTokenID++];
+					nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+				}
+			}
+			else if (currToken.getTokenType() == TokenType::ENDPAREN)
+			{
+				incLoc = 3; // regind  ld ri, [rj]
+
+				currToken = tokens[currTokenID++];
+				nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+
+				vector <char> dataVector;
+				int adrMode = 0x02;
+
+				int value = assembler.pcRelativeSymbolValue(currToken.text());
+				dataVector.push_back(assembler.instructionBinary(instructionText));
+				dataVector.push_back(regDesc);
+				dataVector.push_back(adrMode);
+
+				assembler.updateSectionMap(dataVector, incLoc);
+			}
+
+		}break;
+
+		case TokenType::LITERAL:
+		case TokenType::SYMBOL: {
+
+			debug({ TokenType::LITERAL, TokenType::SYMBOL });
+			incLoc = 5;
+			vector <char> dataVector;
+			regDesc += 0xF;
+			int adrMode = 0x04;
+			int value;
+
+
+
+			if (currToken.getTokenType() == TokenType::LITERAL)
+			{
+				value = stoi(currToken.text(), 0, 16);
+			}
+			else
+			{
+				//symbol
+				value = assembler.absoluteSymbolValue(currToken.text());
+			}
+
+
+			dataVector.push_back(assembler.instructionBinary(instructionText));
+			dataVector.push_back(regDesc);
+			dataVector.push_back(adrMode);
+			dataVector.push_back((value >> 8) & 0xff);
+			dataVector.push_back(value & 0xff);
+
+			assembler.updateSectionMap(dataVector, incLoc);
+
+		};  break; //memdir oba ova
+
+		}
+
+		//assembler.updateLocationCounter(incLoc);
+
+	}
+	else {
+		/*
+		xchg regD, regS temp <= regD; regD <= regS; regS <= temp; -
+		add regD, regS regD <= regD + regS; -
+		sub regD, regS regD <= regD - regS; -
+		mul regD, regS regD <= regD * regS; -
+		div regD, regS regD <= regD / regS; -
+		cmp regD, regS temp <= regD - regS; Z O C N
+		not regD regD <= ~regD; -
+		and regD, regS regD <= regD & regS; -
+		or regD, regS regD <= regD | regS -
+		xor regD, regS regD <= regD ^ regS; -
+		test regD, regS temp <= regD & regS; Z N
+		shl regD, regS regD <= regD << regS; Z C N
+		shr regD, regS regD <= regD >> regS; Z C N*/
+		vector<char> dataVector;
+
+		currToken = tokens[currTokenID++];//registar
+		nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+
+		int regDesc = currToken.text().at(1) - '0';
+		//checkCurrentAndSkipNext(TokenType::REGISTER);
+		// 
+		//checkCurrentAndSkipNext(TokenType::COMMA);
+
+		currToken = tokens[currTokenID++];//zarez
+		nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+
+		currToken = tokens[currTokenID++];//registar
+		nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
+
+		regDesc <<= 4;
+
+		regDesc += currToken.text().at(1) - '0';
+
+		dataVector.push_back(assembler.instructionBinary(instructionText));
+		dataVector.push_back(regDesc);
+
+		assembler.updateSectionMap(dataVector, 2);
+
+	}
+
+
+	//da se dobije lineEnd
+	currToken = tokens[currTokenID++];
+	nextToken = (currTokenID < tokens.size()) ? tokens[currTokenID] : Token();
 }
 
 void SecondPassParser::debug(TokenType tokenType)

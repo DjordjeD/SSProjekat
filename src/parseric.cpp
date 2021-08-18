@@ -36,8 +36,8 @@ SecondPassAsm Parser::parse()
 
 
 
-	assembler.printSymbolTable();
-	assembler.printSectionList();
+	//assembler.printSymbolTable();
+	//assembler.printSectionList();
 
 
 	// 

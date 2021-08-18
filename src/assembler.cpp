@@ -148,7 +148,11 @@ void Assembler::addExtern(string text)
 void Assembler::addEqu(string name, string tokenText)
 {
 	Symbol* symbol = getSymbolCheck(name);
-	Symbol s1(name, std::stoi(tokenText));
+	int value;
+	if (tokenText.at(0) == '0') value = std::stoi(tokenText, 0, 16);
+	else value = std::stoi(tokenText);
+
+	Symbol s1(name, value);
 	/*
 	symbolType = SymbolType::EQU;
 		value = _value;
