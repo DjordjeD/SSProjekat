@@ -32,7 +32,7 @@ void SecondPassParser::parse()
 
 	cout << "sectionMAP" << endl;
 	assembler.printSectionMap();
-
+	assembler.createTxtFile("");
 }
 
 

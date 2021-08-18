@@ -379,6 +379,56 @@ int SecondPassAsm::pcRelativeSymbolValue(string symbolName)
 	return -1000;
 }
 
+void SecondPassAsm::createTxtFile(string path)
+{
+	ofstream outputFile("output.txt");
+
+
+	outputFile << "Symbol table:" << endl;
+	outputFile << "Value\tType\tSection\t\tName\t\tId" << endl;
+
+	for (auto& i : symbolTable)
+	{
+		outputFile << hex << i.getValue() << "\t " << scopePrint(i) << "\t " << i.getSection() << "\t " << i.getSymbolName() << "\t " << i.getNumberID() << endl;
+	}
+	outputFile << endl << " END OF SYMBOL TABLE" << endl << endl;
+
+
+	outputFile << endl;
+	for (auto& i : sectionMap)
+	{
+		outputFile << "Section data of " << i.first << " :" << endl;
+
+		for (size_t j = 0; j < i.second.offsets.size(); j++) //j iterira po redovima jer isto ima offseta i redova
+		{
+			outputFile << hex << setfill('0') << setw(4) << i.second.offsets.at(j) << " : " << "\t";
+
+			for (size_t k = 0; k < i.second.data[j].size(); k++)
+			{
+				outputFile << hex << setfill('0') << setw(2) << (0xff & i.second.data[j][k]) << " ";
+			}
+
+			outputFile << endl;
+		}
+
+		outputFile << endl;
+
+		outputFile << "Relocation for " << i.first << endl;
+		outputFile << "Offset " << "\t" << "IsData" << "\t" << "relocationType" << "\t" << "sectionName" << "\t" << "symbolName(value)" << endl;
+		for (auto& j : relocationTable)
+		{
+
+			if (i.first == j.sectionName) {
+
+
+				outputFile << j.offset << "\t" << j.isData << "\t" << j.relocationType << "\t" << j.sectionName << "\t\t" << j.symbolName << endl;
+			}
+		}
+		outputFile << endl << endl;
+	}
+	outputFile.close();
+}
+
 AssemblerException::AssemblerException(std::string msg)
 {
 	_msg = msg;

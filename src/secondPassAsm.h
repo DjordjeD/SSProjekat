@@ -1,7 +1,7 @@
 #pragma once
 #include "assembler.h"
 #include <map>
-
+#include <fstream>
 
 class AssemblerException : public std::exception
 {
@@ -72,6 +72,7 @@ public:
 	int absoluteSymbolValue(string symbolName);
 	int pcRelativeSymbolValue(string symbolName);
 
+	void createTxtFile(string path);
 
 
 };
