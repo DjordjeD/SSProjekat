@@ -73,6 +73,7 @@ public:
 	int pcRelativeSymbolValue(string symbolName);
 
 	void createTxtFile(string path);
+	void createBinaryFile(string path);
 
 
 };

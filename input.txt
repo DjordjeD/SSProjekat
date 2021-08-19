@@ -26,7 +26,7 @@ isr_terminal:
  push r1
  ldr r0, term_in
  str r0, term_out
- ldr r0, %myCounter #pcrel
+ ldr r0, %myCounter # pcrel
  ldr r1, $1
  add r0, r1
  str r0, myCounter # abs

@@ -429,6 +429,188 @@ void SecondPassAsm::createTxtFile(string path)
 	outputFile.close();
 }
 
+void SecondPassAsm::createBinaryFile(string path)
+{
+	ofstream outputFile("outputBinary", ios::out | ios::binary);
+
+
+	unsigned int stringLenght;
+	int intValue;
+	bool boolValue;
+
+	int sizeSym = symbolTable.size();
+	//velicina tabele simbola, posle je pokupimo
+	outputFile.write((char*)(&sizeSym), sizeof(sizeSym));
+
+	for (auto& i : symbolTable)
+	{
+		stringLenght = i.getSymbolName().length();
+		outputFile.write((char*)&stringLenght, sizeof(stringLenght));
+		outputFile.write(i.getSymbolName().c_str(), i.getSymbolName().length());
+
+		intValue = i.getValue();
+		outputFile.write((char*)(&intValue), sizeof(intValue));
+
+		string scope = scopePrint(i);
+		stringLenght = scope.length();
+		outputFile.write((char*)&stringLenght, sizeof(stringLenght));
+		outputFile.write(scope.c_str(), scope.length());
+
+		intValue = i.getNumberID();
+		outputFile.write((char*)(&intValue), sizeof(intValue));
+
+		boolValue = i.isDefined();
+		outputFile.write((char*)(&boolValue), sizeof(boolValue));
+
+		stringLenght = i.getSection().length();
+		outputFile.write((char*)&stringLenght, sizeof(stringLenght));
+		outputFile.write(i.getSection().c_str(), i.getSection().length());
+
+	}
+
+	int sizeRelocation = relocationTable.size();
+	outputFile.write((char*)(&sizeRelocation), sizeof(sizeRelocation));
+
+	for (auto& i : relocationTable)
+	{
+		boolValue = i.isData;
+		outputFile.write((char*)(&boolValue), sizeof(boolValue));
+
+		intValue = i.offset;
+		outputFile.write((char*)(&intValue), sizeof(intValue));
+
+
+		stringLenght = i.sectionName.length();
+		outputFile.write((char*)&stringLenght, sizeof(stringLenght));
+		outputFile.write(i.sectionName.c_str(), i.sectionName.length());
+
+
+		stringLenght = i.relocationType.length();
+		outputFile.write((char*)&stringLenght, sizeof(stringLenght));
+		outputFile.write(i.relocationType.c_str(), i.relocationType.length());
+
+		stringLenght = i.symbolName.length();
+		outputFile.write((char*)&stringLenght, sizeof(stringLenght));
+		outputFile.write(i.symbolName.c_str(), i.symbolName.length());
+
+	}
+
+	int sizeOfSectionMap = sectionMap.size();//kolko ih ima
+	outputFile.write((char*)(&sizeOfSectionMap), sizeof(sizeOfSectionMap));
+
+	for (auto& i : sectionMap)
+	{
+
+		//cout << "Section data of " << i.first << " :" << endl;
+		stringLenght = i.first.length();
+		outputFile.write((char*)&stringLenght, sizeof(stringLenght));
+		outputFile.write(i.first.c_str(), i.first.length());//
+
+
+		intValue = i.second.offsets.size();
+		outputFile.write((char*)(&intValue), sizeof(intValue)); // gurni broj offseta
+
+		for (size_t j = 0; j < i.second.offsets.size(); j++) //j iterira po redovima jer isto ima offseta i redova
+		{
+			//cout << hex << setfill('0') << setw(4) << i.second.offsets.at(j) << " : " << "\t";
+
+			intValue = i.second.offsets.at(j);
+			outputFile.write((char*)(&intValue), sizeof(intValue)); // gurni offset
+
+
+			intValue = i.second.data[j].size(); // gurni velicinu data vektora
+			outputFile.write((char*)(&intValue), sizeof(intValue));
+
+			for (size_t k = 0; k < i.second.data[j].size(); k++)
+			{
+				//cout << hex << setfill('0') << setw(2) << (0xff & i.second.data[j][k]) << " ";
+
+				intValue = i.second.data[j][k]; // gurni data u data vektoru
+				outputFile.write((char*)(&intValue), sizeof(intValue));
+			}
+
+			//cout << endl;
+		}
+
+		//cout << endl;
+
+
+	}
+
+
+
+	outputFile.close();
+
+	ifstream inputFile("outputBinary", ios::out | ios::binary);
+
+	string s1, s2, s3;
+	int i1, i2, i3, i4;
+	bool b1;
+	inputFile.read((char*)&i2, sizeof(i2));// size tabele simbola
+
+	for (size_t i = 0; i < i2; i++)
+	{
+
+		inputFile.read((char*)&stringLenght, sizeof(stringLenght)); //ime
+		s1.resize(stringLenght);
+		inputFile.read((char*)s1.c_str(), stringLenght);
+
+		inputFile.read((char*)&i1, sizeof(i1)); //value
+
+		inputFile.read((char*)&stringLenght, sizeof(stringLenght)); //scope
+		s2.resize(stringLenght);
+		inputFile.read((char*)s2.c_str(), stringLenght);
+
+		inputFile.read((char*)&i3, sizeof(i3)); //numberID
+
+		inputFile.read((char*)&b1, sizeof(b1)); //isdefined
+
+		inputFile.read((char*)&stringLenght, sizeof(stringLenght)); //section
+		s3.resize(stringLenght);
+		inputFile.read((char*)s3.c_str(), stringLenght);
+
+
+		std::cout << s1 << "\t" << i1 << "\t" << s2 << "\t" << i3 << "\t" << b1 << "\t" << s3 << endl;
+
+	}
+
+	inputFile.read((char*)&sizeRelocation, sizeof(sizeRelocation));//
+
+	for (size_t i = 0; i < sizeRelocation; i++)
+	{
+		RelocationRecord temp;
+		//string tempString;
+		inputFile.read((char*)&(temp.isData), sizeof(temp.isData));
+		inputFile.read((char*)&(temp.offset), sizeof(temp.offset));
+
+
+		inputFile.read((char*)&stringLenght, sizeof(stringLenght)); //ime
+		temp.sectionName.resize(stringLenght);
+		inputFile.read((char*)temp.sectionName.c_str(), stringLenght);
+
+		inputFile.read((char*)&stringLenght, sizeof(stringLenght)); //ime
+		temp.relocationType.resize(stringLenght);
+		inputFile.read((char*)temp.relocationType.c_str(), stringLenght);
+
+
+		inputFile.read((char*)&stringLenght, sizeof(stringLenght)); //ime
+		temp.symbolName.resize(stringLenght);
+		inputFile.read((char*)temp.symbolName.c_str(), stringLenght);
+
+		std::cout << temp.isData << "\t" << temp.offset << "\t" << temp.sectionName << "\t" << temp.relocationType << "\t" << temp.symbolName << endl;
+	}
+
+	inputFile.close();
+	/*inputFile.read((char*)&stringLenght, sizeof(stringLenght));
+	s1.resize(stringLenght);
+	inputFile.read((char*)s1.c_str(), stringLenght);
+
+	inputFile.read((char*)&i1, sizeof(i1));
+	*/
+	//cout << "binarni ispis" << endl;
+
+}
+
 AssemblerException::AssemblerException(std::string msg)
 {
 	_msg = msg;

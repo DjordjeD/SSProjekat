@@ -31,8 +31,9 @@ void SecondPassParser::parse()
 	assembler.printSymbolTable();
 
 	cout << "sectionMAP" << endl;
-	assembler.printSectionMap();
-	assembler.createTxtFile("");
+	//assembler.printSectionMap();
+	//assembler.createTxtFile("");
+	assembler.createBinaryFile("");
 }
 
 
