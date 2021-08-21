@@ -466,6 +466,17 @@ void SecondPassAsm::createBinaryFile(string path)
 		outputFile.write((char*)&stringLenght, sizeof(stringLenght));
 		outputFile.write(i.getSection().c_str(), i.getSection().length());
 
+		if (i.getSymbolType() == SymbolType::SECTION) {
+			boolValue = false;
+			outputFile.write((char*)(&boolValue), sizeof(boolValue));
+		}
+		else
+		{
+			boolValue = true;
+			outputFile.write((char*)(&boolValue), sizeof(boolValue));
+
+		}
+
 	}
 
 	int sizeRelocation = relocationTable.size();

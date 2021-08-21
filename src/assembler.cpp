@@ -23,6 +23,7 @@ void Assembler::addSection(string SectionName)
 
 		symbol->setSection(currentSection);
 		//symbol->setValue(0);
+		symbol->setSymbolType(SymbolType::SECTION);
 		symbol->setIsDefined(true);
 		locationCounter = 0;
 

@@ -32,6 +32,9 @@ public:
 		Symbol section1("ABSOLUTE", "ABSOLUTE", -1);
 		Symbol section2("UNDEFINED", "UNDEFINED", 0);
 
+		section1.setSymbolType(SymbolType::SECTION);
+		section2.setSymbolType(SymbolType::SECTION);
+
 		symbolTable.push_back(section1);
 		symbolTable.push_back(section2);
 
