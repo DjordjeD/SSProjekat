@@ -45,10 +45,11 @@ void Assembler::changeCurrentSection(string sectionName)
 
 void Assembler::printSectionList()
 {
-
+	cout << "Section LIST " << endl;
+	cout << "ID\t Section\t Size" << endl;
 	for (auto& i : sectionList)
 	{
-		cout << i.second.getID() << " " << i.second.getSectionName() << " " << i.second.getSectionSize() << endl;
+		cout << hex << i.second.getID() << "\t" << i.second.getSectionName() << "\t" << i.second.getSectionSize() << endl;
 	}
 }
 

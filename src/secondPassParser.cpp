@@ -26,7 +26,7 @@ void SecondPassParser::parse()
 		cout << "Error at line: " << current_line << ". ASM failed  " << assemblerException.what() << endl;
 	}
 
-	//assembler.printSectionMap();
+	assembler.printSectionMap();
 	//assembler.printSectionList();
 	assembler.printSymbolTable();
 
@@ -247,14 +247,14 @@ void SecondPassParser::instructionAdd()
 
 		int incLoc = -1000;
 
-		if (checkCurrentAndSkipNext(TokenType::SYMBOL)) {
+		if (currToken.getTokenType() == TokenType::SYMBOL) {
 			incLoc = 5; //jmp simbol
 
 			vector <char> dataVector;
 			int regDesc = 0xFF;
 			int adrMode = 0;
 
-			int value = assembler.absoluteSymbolValue(tokens[currTokenID - 2].text());
+			int value = assembler.absoluteSymbolValue(tokens[currTokenID - 1].text());
 			dataVector.push_back(assembler.instructionBinary(instructionText));
 			dataVector.push_back(regDesc);
 			dataVector.push_back(adrMode);
@@ -264,14 +264,14 @@ void SecondPassParser::instructionAdd()
 			assembler.updateSectionMap(dataVector, incLoc);
 
 		}
-		else if (checkCurrentAndSkipNext(TokenType::LITERAL))
+		else if (currToken.getTokenType() == TokenType::LITERAL)
 		{
 			incLoc = 5; //jmp Label
 
 			vector <char> dataVector;
 			int regDesc = 0xFF;
 			int adrMode = 0;
-			int value = stoi(tokens[currTokenID - 2].text(), 0, 16);
+			int value = stoi(tokens[currTokenID - 1].text(), 0, 16);
 
 			dataVector.push_back(assembler.instructionBinary(instructionText));
 			dataVector.push_back(regDesc);

@@ -514,6 +514,14 @@ void SecondPassAsm::createBinaryFile(string path)
 		{
 			//cout << hex << setfill('0') << setw(4) << i.second.offsets.at(j) << " : " << "\t";
 
+			//stringLenght = i.second.getSectionName().length();
+			//outputFile.write((char*)&stringLenght, sizeof(stringLenght));
+			//outputFile.write(i.second.getSectionName().c_str(), i.second.getSectionName().length());//
+
+
+			intValue = i.second.getSectionSize();
+			outputFile.write((char*)(&intValue), sizeof(intValue)); //velicinu sekcije
+
 			intValue = i.second.offsets.at(j);
 			outputFile.write((char*)(&intValue), sizeof(intValue)); // gurni offset
 
@@ -570,7 +578,7 @@ void SecondPassAsm::createBinaryFile(string path)
 		inputFile.read((char*)s3.c_str(), stringLenght);
 
 
-		std::cout << s1 << "\t" << i1 << "\t" << s2 << "\t" << i3 << "\t" << b1 << "\t" << s3 << endl;
+		//std::cout << s1 << "\t" << i1 << "\t" << s2 << "\t" << i3 << "\t" << b1 << "\t" << s3 << endl;
 
 	}
 
@@ -597,7 +605,7 @@ void SecondPassAsm::createBinaryFile(string path)
 		temp.symbolName.resize(stringLenght);
 		inputFile.read((char*)temp.symbolName.c_str(), stringLenght);
 
-		std::cout << temp.isData << "\t" << temp.offset << "\t" << temp.sectionName << "\t" << temp.relocationType << "\t" << temp.symbolName << endl;
+		//std::cout << temp.isData << "\t" << temp.offset << "\t" << temp.sectionName << "\t" << temp.relocationType << "\t" << temp.symbolName << endl;
 	}
 
 	inputFile.close();

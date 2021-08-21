@@ -37,7 +37,7 @@ SecondPassAsm Parser::parse()
 
 
 	//assembler.printSymbolTable();
-	//assembler.printSectionList();
+	assembler.printSectionList();
 
 
 	// 
@@ -222,8 +222,8 @@ void Parser::instructionAdd()
 
 		int incLoc = -1000;
 
-		if (checkCurrentAndSkipNext(TokenType::LITERAL)) incLoc = 5;//jmp 1413
-		else if (checkCurrentAndSkipNext(TokenType::SYMBOL)) incLoc = 5; //jmp Label
+		if (currToken.getTokenType() == TokenType::LITERAL) incLoc = 5;//jmp 1413
+		else if (currToken.getTokenType() == TokenType::SYMBOL) incLoc = 5; //jmp Label
 		else if (checkCurrentAndSkipNext(TokenType::PERCENTAGE)) {
 			//jmp %label pcrelative
 			incLoc = 5;
