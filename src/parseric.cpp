@@ -395,7 +395,7 @@ void Parser::instructionAdd()
 		checkCurrentAndSkipNext(TokenType::COMMA);
 
 
-		assembler.updateLocationCounter(3);
+		assembler.updateLocationCounter(2);
 
 	}
 

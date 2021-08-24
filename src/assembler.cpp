@@ -16,7 +16,7 @@ void Assembler::addSection(string SectionName)
 	//tek u drugom prolazu on zna koja je sekcija
 	if (symbol->isDefined() == false)
 	{
-		sectionList[currentSection].increaseSize(locationCounter);
+		sectionList[currentSection].setSectionSize(locationCounter);
 
 
 		currentSection = SectionName;
