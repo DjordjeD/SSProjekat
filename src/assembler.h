@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <string>
 #include <map>
+#include<iomanip>
 
 using namespace std;
 
@@ -61,6 +62,7 @@ public:
 	void addWord(string text);
 	void skipDef(int size);
 
+	void addLastSection();
 	string scopePrint(Symbol s);
 
 	void updateLocationCounter(int size);

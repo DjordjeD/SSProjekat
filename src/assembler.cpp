@@ -50,7 +50,7 @@ void Assembler::printSectionList()
 	cout << "ID\t Section\t Size" << endl;
 	for (auto& i : sectionList)
 	{
-		cout << hex << i.second.getID() << "\t" << i.second.getSectionName() << "\t" << i.second.getSectionSize() << endl;
+		cout << hex << setfill('0') << setw(2) << i.second.getID() << "\t" << i.second.getSectionName() << "\t" << i.second.getSectionSize() << endl;
 	}
 }
 
@@ -178,11 +178,17 @@ void Assembler::addWord(string text)
 
 	// u drugom prolazu mozda i relokacija i vrednost u memoriju
 	locationCounter += 2;
+
 }
 
 void Assembler::skipDef(int size)
 {
 	locationCounter += size;
+}
+
+void Assembler::addLastSection()
+{
+	sectionList[currentSection].increaseSize(locationCounter);
 }
 
 string Assembler::scopePrint(Symbol s)

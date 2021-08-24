@@ -22,8 +22,13 @@ SecondPassAsm Parser::parse()
 
 	try
 	{
-		while (currToken.getTokenType() != TokenType::FILE_END && currToken.getTokenType() != TokenType::END)
+		while (currToken.getTokenType() != TokenType::FILE_END)
 		{
+			if (currToken.getTokenType() == TokenType::END) {
+				assembler.addLastSection(); break;
+			}
+
+
 			current_line++;
 			parseLine();
 		}
