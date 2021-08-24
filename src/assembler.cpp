@@ -178,17 +178,18 @@ void Assembler::addWord(string text)
 
 	// u drugom prolazu mozda i relokacija i vrednost u memoriju
 	locationCounter += 2;
-
+	sectionList[currentSection].increaseSize(2);
 }
 
 void Assembler::skipDef(int size)
 {
 	locationCounter += size;
+	sectionList[currentSection].increaseSize(size);
 }
 
 void Assembler::addLastSection()
 {
-	sectionList[currentSection].increaseSize(locationCounter);
+	//sectionList[currentSection].increaseSize(locationCounter);
 }
 
 string Assembler::scopePrint(Symbol s)
