@@ -2,17 +2,24 @@ Symbol table:
 Value	Type	Section		Name		Id
 0	 l	 ABSOLUTE	 ABSOLUTE	 ffffffff
 0	 l	 UNDEFINED	 UNDEFINED	 0
-0	 g	 myCode	 myStart	 1
-0	 g	 UNDEFINED	 myCounter	 2
-0	 l	 myCode	 myCode	 3
-ff10	 l	 ABSOLUTE	 tim_cfg	 4
-a	 l	 myCode	 wait	 5
+0	 l	 ivt	 ivt	 1
+0	 l	 isr	 isr_reset	 2
+5	 l	 isr	 isr_timer	 3
+16	 l	 isr	 isr_terminal	 4
+0	 e	 UNDEFINED	 myStart	 5
+0	 e	 UNDEFINED	 myCounter	 6
+0	 l	 isr	 isr	 7
+ff00	 l	 ABSOLUTE	 term_out	 8
+ff02	 l	 ABSOLUTE	 term_in	 9
+54	 l	 ABSOLUTE	 asciiCode	 a
 
  END OF SYMBOL TABLE
 
 
 Section data of ABSOLUTE :
-0000 : 	10 ff 
+0000 : 	00 ff 
+0002 : 	02 ff 
+0004 : 	54 00 
 
 Relocation for ABSOLUTE
 Offset 	IsData	relocationType	sectionName	symbolName(value)
@@ -24,17 +31,43 @@ Relocation for UNDEFINED
 Offset 	IsData	relocationType	sectionName	symbolName(value)
 
 
-Section data of myCode :
-0000 : 	a0 0f 00 00 01 
-0005 : 	b0 0f 04 ff 10 
-000a : 	a0 0f 04 00 00 
-000f : 	a0 1f 00 00 05 
-0014 : 	74 01 
-0016 : 	52 ff 00 00 0a 
+Section data of isr :
+0000 : 	50 ff 00 00 00 
+0005 : 	b0 06 12 
+0008 : 	a0 0f 00 00 54 
+000d : 	b0 0f 04 ff 00 
+0012 : 	a0 06 42 
+0015 : 	20 
+0016 : 	b0 06 12 
+0019 : 	b0 16 12 
+001c : 	a0 0f 04 ff 02 
+0021 : 	b0 0f 04 ff 00 
+0026 : 	a0 07 03 ff fe 
+002b : 	a0 1f 00 00 01 
+0030 : 	70 01 
+0032 : 	b0 0f 04 00 00 
+0037 : 	a0 16 42 
+003a : 	a0 06 42 
+003d : 	20 
 
-Relocation for myCode
+Relocation for isr
 Offset 	IsData	relocationType	sectionName	symbolName(value)
-e	0	R_HYP_16	myCode		myCounter
-1a	0	R_HYP_16	myCode		myCode
+4	0	R_HYP_16	isr		myStart
+2a	0	R_HYP_16_PC	isr		myCounter
+36	0	R_HYP_16	isr		myCounter
+
+
+Section data of ivt :
+0000 : 	00 00 
+0002 : 	00 00 
+0004 : 	05 00 
+0006 : 	16 00 
+0008 : 	00 00 00 00 00 00 00 00 
+
+Relocation for ivt
+Offset 	IsData	relocationType	sectionName	symbolName(value)
+0	1	R_HYP_16	ivt		isr
+4	1	R_HYP_16	ivt		isr
+6	1	R_HYP_16	ivt		isr
 
 

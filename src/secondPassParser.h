@@ -31,6 +31,7 @@ public:
 	Token currToken;
 	Token nextToken;
 	vector<Token> tokens;
+	string outputFile;
 
 private:
 
@@ -43,6 +44,7 @@ private:
 	void debug(vector<TokenType> list);
 	bool checkCurrentAndSkipNext(TokenType tokenType);
 	void defineWord(string name);
+
 
 
 

@@ -40,10 +40,6 @@ void SecondPassAsm::printSectionMap()
 }
 
 
-
-
-
-
 void SecondPassAsm::printSymbolTable()
 {
 	cout << "Symbol table:" << endl;
@@ -55,7 +51,6 @@ void SecondPassAsm::printSymbolTable()
 	}
 	cout << endl << " END OF SYMBOL TABLE" << endl << endl;
 }
-
 
 
 string SecondPassAsm::scopePrint(Symbol s)
@@ -381,7 +376,7 @@ int SecondPassAsm::pcRelativeSymbolValue(string symbolName)
 
 void SecondPassAsm::createTxtFile(string path)
 {
-	ofstream outputFile("output.txt");
+	ofstream outputFile(path);
 
 
 	outputFile << "Symbol table:" << endl;
@@ -431,7 +426,7 @@ void SecondPassAsm::createTxtFile(string path)
 
 void SecondPassAsm::createBinaryFile(string path)
 {
-	ofstream outputFile("outputBinary", ios::out | ios::binary);
+	ofstream outputFile("linkerInput", ios::out | ios::binary);
 
 
 	unsigned int stringLenght;
@@ -560,73 +555,7 @@ void SecondPassAsm::createBinaryFile(string path)
 
 	outputFile.close();
 
-	ifstream inputFile("outputBinary", ios::out | ios::binary);
 
-	string s1, s2, s3;
-	int i1, i2, i3, i4;
-	bool b1;
-	inputFile.read((char*)&i2, sizeof(i2));// size tabele simbola
-
-	for (size_t i = 0; i < i2; i++)
-	{
-
-		inputFile.read((char*)&stringLenght, sizeof(stringLenght)); //ime
-		s1.resize(stringLenght);
-		inputFile.read((char*)s1.c_str(), stringLenght);
-
-		inputFile.read((char*)&i1, sizeof(i1)); //value
-
-		inputFile.read((char*)&stringLenght, sizeof(stringLenght)); //scope
-		s2.resize(stringLenght);
-		inputFile.read((char*)s2.c_str(), stringLenght);
-
-		inputFile.read((char*)&i3, sizeof(i3)); //numberID
-
-		inputFile.read((char*)&b1, sizeof(b1)); //isdefined
-
-		inputFile.read((char*)&stringLenght, sizeof(stringLenght)); //section
-		s3.resize(stringLenght);
-		inputFile.read((char*)s3.c_str(), stringLenght);
-
-
-		//std::cout << s1 << "\t" << i1 << "\t" << s2 << "\t" << i3 << "\t" << b1 << "\t" << s3 << endl;
-
-	}
-
-	inputFile.read((char*)&sizeRelocation, sizeof(sizeRelocation));//
-
-	for (size_t i = 0; i < sizeRelocation; i++)
-	{
-		RelocationRecord temp;
-		//string tempString;
-		inputFile.read((char*)&(temp.isData), sizeof(temp.isData));
-		inputFile.read((char*)&(temp.offset), sizeof(temp.offset));
-
-
-		inputFile.read((char*)&stringLenght, sizeof(stringLenght)); //ime
-		temp.sectionName.resize(stringLenght);
-		inputFile.read((char*)temp.sectionName.c_str(), stringLenght);
-
-		inputFile.read((char*)&stringLenght, sizeof(stringLenght)); //ime
-		temp.relocationType.resize(stringLenght);
-		inputFile.read((char*)temp.relocationType.c_str(), stringLenght);
-
-
-		inputFile.read((char*)&stringLenght, sizeof(stringLenght)); //ime
-		temp.symbolName.resize(stringLenght);
-		inputFile.read((char*)temp.symbolName.c_str(), stringLenght);
-
-		//std::cout << temp.isData << "\t" << temp.offset << "\t" << temp.sectionName << "\t" << temp.relocationType << "\t" << temp.symbolName << endl;
-	}
-
-	inputFile.close();
-	/*inputFile.read((char*)&stringLenght, sizeof(stringLenght));
-	s1.resize(stringLenght);
-	inputFile.read((char*)s1.c_str(), stringLenght);
-
-	inputFile.read((char*)&i1, sizeof(i1));
-	*/
-	//cout << "binarni ispis" << endl;
 
 }
 

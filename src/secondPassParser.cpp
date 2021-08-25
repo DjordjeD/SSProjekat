@@ -26,14 +26,15 @@ void SecondPassParser::parse()
 		cout << "Error at line: " << current_line << ". ASM failed  " << assemblerException.what() << endl;
 	}
 
+	cout << "sectionMAP" << endl;
 	assembler.printSectionMap();
 	//assembler.printSectionList();
 	assembler.printSymbolTable();
 
-	cout << "sectionMAP" << endl;
+
 	//assembler.printSectionMap();
-	//assembler.createTxtFile("");
-	assembler.createBinaryFile("");
+	assembler.createTxtFile(outputFile);
+	assembler.createBinaryFile(outputFile);
 }
 
 
