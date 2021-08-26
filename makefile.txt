@@ -1,0 +1,1 @@
+c++   -I./inc  -I./inc/reflex/include src/main.cpp src/assembler.cpp src/lexeric.cpp src/parseric.cpp src/secondPassAsm.cpp src/secondPassParser.cpp src/sectionTable.cpp src/symbol.cpp src/tokens.cpp  ./inc/reflex/lib/libreflex.a  -o assembler
