@@ -1,0 +1,6 @@
+﻿  lexer.cpp
+  main.cpp
+  parser.cpp
+D:\Helper\Mira\SS\Asembler\Asembler\src\parser.cpp(270,32): warning C4018: '<': signed/unsigned mismatch
+  Generating Code...
+  Asembler.vcxproj -> D:\Helper\Mira\SS\Asembler\Debug\Asembler.exe

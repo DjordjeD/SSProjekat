@@ -1,0 +1,4 @@
+﻿  'C:\Users\Dimitrijevic\Desktop\SS' is not recognized as an internal or external command,
+  operable program or batch file.
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Microsoft\VC\v160\Microsoft.CppCommon.targets(145,5): error MSB3073: The command "C:\Users\Dimitrijevic\Desktop\SS PROJEKAT\Andrija ASM\Asembler\reflex\bin\win64\reflex.exe -o C:\Users\Dimitrijevic\Desktop\SS PROJEKAT\Andrija ASM\Asembler\src\lexer.cpp --header-file=C:\Users\Dimitrijevic\Desktop\SS PROJEKAT\Andrija ASM\Asembler\h\lexer.h C:\Users\Dimitrijevic\Desktop\SS PROJEKAT\Andrija ASM\Asembler\spec\test.l
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Microsoft\VC\v160\Microsoft.CppCommon.targets(145,5): error MSB3073: :VCEnd" exited with code 9009.
