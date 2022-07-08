@@ -1,0 +1,103 @@
+Linker output
+
+Helper info:
+Section: ABSOLUTE :{
+	# linker_input_projinterrupts.o		ABSOLUTE	linker_input_projinterrupts.o:	6 [2,8)
+	# linker_input_projmain.o		ABSOLUTE	linker_input_projmain.o:	2 [0,2)
+	}
+
+Section: isr :{
+	# linker_input_projinterrupts.o		isr	linker_input_projinterrupts.o:	3e [500,53e)
+	}
+
+Section: ivt :{
+	# linker_input_projinterrupts.o		ivt	linker_input_projinterrupts.o:	10 [53e,54e)
+	}
+
+Section: myCode :{
+	# linker_input_projmain.o		myCode	linker_input_projmain.o:	1c [54e,56a)
+	}
+
+Section: myData :{
+	# linker_input_projmain.o		myData	linker_input_projmain.o:	2 [56a,56c)
+	}
+
+Section table
+Id	Name		Size	VA
+ffffffff	ABSOLUTE	0008	0000
+0	UNDEFINED	0000	0000
+1	isr	003e	0500
+2	ivt	0010	053e
+3	myCode	001c	054e
+4	myData	0002	056a
+
+Symbol table
+Value	Type	Section		Name		Id
+0000	l		ABSOLUTE		ABSOLUTE	ffff
+0000	l		UNDEFINED		UNDEFINED	0000
+0054	l		ABSOLUTE		asciiCode	0009
+0500	l		isr		isr	0001
+0500	l		isr		isr_reset	000a
+0516	l		isr		isr_terminal	000b
+0505	l		isr		isr_timer	000c
+053e	l		ivt		ivt	0002
+054e	l		myCode		myCode	0003
+056a	g		myData		myCounter	0005
+056a	l		myData		myData	0004
+054e	g		myCode		myStart	0006
+ff02	l		ABSOLUTE		term_in	000d
+ff00	l		ABSOLUTE		term_out	000e
+ff10	l		ABSOLUTE		tim_cfg	0007
+0558	l		myCode		wait	0008
+
+Relocation data
+Offset	Type		Dat/Ins	Symbol		Section name
+000e	R_HYP_16	i		myCounter		myCode
+		linker_input_projmain.o
+001a	R_HYP_16	i		myCode		myCode
+		linker_input_projmain.o
+0000	R_HYP_16	d		isr		ivt
+		linker_input_projinterrupts.o
+0004	R_HYP_16	d		isr		ivt
+		linker_input_projinterrupts.o
+0006	R_HYP_16	d		isr		ivt
+		linker_input_projinterrupts.o
+0004	R_HYP_16	i		myStart		isr
+		linker_input_projinterrupts.o
+002a	R_HYP_16_PC	i		myCounter		isr
+		linker_input_projinterrupts.o
+0036	R_HYP_16	i		myCounter		isr
+		linker_input_projinterrupts.o
+
+Content:
+Section data <ABSOLUTE>:
+0000   10 ff 00 ff 02 ff 54 00 
+
+
+Section data <UNDEFINED>:
+
+
+Section data <isr>:
+0500   50 ff 00 05 4e b0 06 12 
+0508   a0 0f 00 00 54 b0 0f 04 
+0510   ff 00 a0 06 42 20 b0 06 
+0518   12 b0 16 12 a0 0f 04 ff 
+0520   02 b0 0f 04 ff 00 a0 07 
+0528   03 00 3f a0 1f 00 00 01 
+0530   70 01 b0 0f 04 05 6a a0 
+0538   16 42 a0 06 42 20 
+
+Section data <ivt>:
+053e   00 05 00 00 05 05 16 05 
+0546   00 00 00 00 00 00 00 00 
+
+
+Section data <myCode>:
+054e   a0 0f 00 00 01 b0 0f 04 
+0556   ff 10 a0 0f 04 05 6a a0 
+055e   1f 00 00 05 74 01 52 ff 
+0566   00 05 58 00 
+
+Section data <myData>:
+056a   00 00 
+
